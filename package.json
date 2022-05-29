@@ -10,6 +10,7 @@
     "start": "nodemon src/index.ts",
     "format": "prettier --config .prettierrc.json src --write"
   },
+  "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
