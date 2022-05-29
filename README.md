@@ -1,8 +1,7 @@
 # Nutrition System
 ---
 ## Table of Contents    
-- [description]
-(#description)
+- [description](#description)
 - [Installation](#installation)
 - [Usage](#usage)
 - [License](#license)
