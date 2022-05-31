@@ -1,15 +1,12 @@
-// all routes will be import here and aded in this array then server can read it 
-import express from 'express'
+// all routes will be import here and aded in this array then server can read it
+import express from 'express';
 
-const root = express.Router()
+const root = express.Router();
 
-root.get('/',(req: express.Request, res: express.Response):void => {
-    res.status(200).send('Hello World')
-    return
-})
+root.get('/', (req: express.Request, res: express.Response): void => {
+  res.status(200).send('Hello World');
+});
 
-const router : express.Router[] = [
-    root
-]
+const router: express.Router[] = [root];
 
-export default router
+export default router;
