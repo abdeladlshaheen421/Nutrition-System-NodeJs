@@ -10,7 +10,7 @@ const {SERVER_PORT} = process.env
 
 const app : express.Application = express()
 
-mongoose.connect('mongodb://localhost:27017/dbname')
+mongoose.connect('mongodb://localhost:27017/NutritionSystem')
     .then(():void => {
         console.log('connected to mongodb')
         app.listen(SERVER_PORT||8080,():void => {
