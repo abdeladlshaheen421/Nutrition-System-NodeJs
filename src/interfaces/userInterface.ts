@@ -3,6 +3,6 @@ interface User {
     lastName: string;
     email: string;
     image?: string;
-  }
+}
    
-  export default User;
+export default User;

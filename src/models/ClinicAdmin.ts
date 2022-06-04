@@ -31,4 +31,4 @@ const clinicAdminSchema = new Schema({
   },
 });
 
-module.exports = mongoose.model('clinic_admins', clinicAdminSchema);
+module.exports = mongoose.model('clinic_admin', clinicAdminSchema);

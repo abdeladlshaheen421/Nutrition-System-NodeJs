@@ -2,9 +2,28 @@ import { NextFunction, Request, Response, Router } from 'express';
 import UserModel, { User } from './../models/user.model';
 import passport from 'passport';
 import { authentication } from "../utilities/authentication";
+import jwt, { Secret } from 'jsonwebtoken'
+const secretKey = process.env.TOKEN_SECRET as Secret
 
 const router: Router = Router();
 
+export const verifyAuthToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const header = req.headers.authorization as unknown as string
+    const jwtToken = header.split(' ')[1]
+    const decoded = jwt.verify(jwtToken, secretKey)
+    //sending data of logged in user to the next middleware
+    res.locals.authUser = decoded
+    next()
+  } catch (error) {
+    res.status(401)
+    res.send('Unauthorized')
+  }
+}
 //GET /api/user
 router.get('/user', authentication.required, (req: Request, res: Response, next: NextFunction) => {
   
