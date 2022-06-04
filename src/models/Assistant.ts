@@ -8,6 +8,8 @@ const assistantSchema = new Schema({
   },
   email: {
     type: String,
+    trim: true,
+    lowercase: true,
     unique: true,
     required: true,
   },

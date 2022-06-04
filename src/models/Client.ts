@@ -1,47 +1,47 @@
 import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
-enum Gender {
+export enum Gender {
   'Male',
   'Female',
 }
 
 const clientSchema = new Schema({
   first_name: {
-    type: String,
+    type: Schema.Types.String,
     required: true,
   },
   last_name: {
-    type: String,
+    type: Schema.Types.String,
     required: true,
   },
   username: {
-    type: String,
-    unique: true,
+    type: Schema.Types.String,
   },
   email: {
-    type: String,
+    type: Schema.Types.String,
     unique: true,
+    trim: true,
+    lowercase: true,
     required: true,
   },
   password: {
-    type: String,
+    type: Schema.Types.String,
     required: true,
   },
   phone: {
-    type: Number,
+    type: Schema.Types.Number,
     required: true,
   },
   gender: {
-    type: String,
-    required: true,
+    type: Schema.Types.String,
     enum: Gender,
   },
   last_visit: {
-    type: Date,
+    type: Schema.Types.Date,
   },
   birth_date: {
-    type: Date,
+    type: Schema.Types.Date,
   },
 });
 

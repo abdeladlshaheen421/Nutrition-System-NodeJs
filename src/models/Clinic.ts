@@ -3,37 +3,43 @@ const { Schema } = mongoose;
 
 const clinicSchema = new Schema({
   name: {
-    type: String,
+    type: Schema.Types.String,
     required: true,
   },
   email: {
-    type: String,
+    type: Schema.Types.String,
     unique: true,
+    trim: true,
+    lowercase: true,
     required: true,
   },
   location: {
-    type: String,
-    unique: true,
+    type: Schema.Types.String,
     required: true,
   },
   waiting_time: {
-    type: String,
+    type: Schema.Types.String,
     required: true,
   },
   opens_at: {
-    type: Date,
+    type: Schema.Types.Date,
     required: true,
   },
   closes_at: {
-    type: Date,
+    type: Schema.Types.Date,
     required: true,
   },
   phone: {
-    type: Number,
+    type: Schema.Types.Number,
     required: true,
   },
   price: {
-    type: Number,
+    type: Schema.Types.Number,
+    required: true,
+  },
+  clinic_admin: {
+    type: Schema.Types.ObjectId,
+    ref: 'clinic_admins',
     required: true,
   },
 });
