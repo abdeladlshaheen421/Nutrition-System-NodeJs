@@ -17,4 +17,4 @@ const assistantSchema = new Schema({
   },
 });
 
-module.exports = mongoose.model('assistants', assistantSchema);
+module.exports = mongoose.model('assistant', assistantSchema);

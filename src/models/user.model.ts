@@ -1,9 +1,13 @@
 import { Document, Model, model, Schema } from 'mongoose';
 import User from '../interfaces/userInterface';
 import * as jwt from 'jsonwebtoken';
-import * as crypto from 'crypto';
-import { JWT_SECRET } from "./../utilities/secrets";
+import bcrypt from 'bcrypt';
+import dotenv from 'dotenv';
 
+dotenv.config();
+
+const { BCRYPT_PASSWORD, SALT_ROUNDS } = process.env;
+const secretKey = process.env.TOKEN_SECRET as jwt.Secret
 
 export default interface UserModel extends User, Document {
   token?: string;
@@ -15,77 +19,95 @@ export default interface UserModel extends User, Document {
   profileJSON(user: UserModel): any;
 }
 
-
-const UserSchema = new Schema({
-  firstName : {
-    type     : Schema.Types.String,
-    lowercase: true,
-    match    : [/^[a-zA-Z]+$/, 'is invalid'],
-    index    : true
+const UserSchema = new Schema(
+  {
+    firstName: {
+      type: Schema.Types.String,
+      lowercase: true,
+      match: [/^[a-zA-Z]+$/, 'is invalid'],
+      index: true,
+    },
+    lastName: {
+      type: Schema.Types.String,
+      lowercase: true,
+      match: [/^[a-zA-Z]+$/, 'is invalid'],
+      index: true,
+    },
+    email: {
+      type: Schema.Types.String,
+      lowercase: true,
+      unique: true,
+      match: [/\S+@\S+\.\S+/, 'is invalid'],
+      index: true,
+    },
+    image: {
+      type: Schema.Types.String,
+    },
+    password: {
+      type: Schema.Types.String,
+    },
   },
-  lastName : {
-    type     : Schema.Types.String,
-    lowercase: true,
-    match    : [/^[a-zA-Z]+$/, 'is invalid'],
-    index    : true
-  },
-  email    : {
-    type     : Schema.Types.String,
-    lowercase: true,
-    unique   : true,
-    match    : [/\S+@\S+\.\S+/, 'is invalid'],
-    index    : true
-  },
-  image    : {
-    type: Schema.Types.String
-  },
-  hash     : {
-    type: Schema.Types.String
-  },
-  salt     : {
-    type: Schema.Types.String
-  },
-}, {timestamps: true});
+  { timestamps: true }
+);
 
 UserSchema.methods.validPassword = function (password: string): boolean {
-  const hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex');
-  return this.hash === hash;
+  return bcrypt.compareSync(password + BCRYPT_PASSWORD, this.password)
 };
 
-UserSchema.methods.setPassword = function (password: string) {
-  this.salt = crypto.randomBytes(16).toString('hex');
-  this.hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex');
+UserSchema.methods.setPassword = function (password: string):void {
+  const hashedPassword = bcrypt.hashSync(
+    password + BCRYPT_PASSWORD,
+    parseInt(SALT_ROUNDS as string)
+  );
+  this.password = hashedPassword;
 };
 
 UserSchema.methods.generateJWT = function (): string {
-  const todayDate = new Date();
-  const exp   = new Date(todayDate);
-  exp.setDate(todayDate.getDate() + 30);
-
-  return jwt.sign({
-    id      : this._id,
-    email: this.email,
-    exp     : exp.getTime() / 1000,
-  }, JWT_SECRET);
+  return jwt.sign(
+    {
+      id: this._id,
+      email: this.email,
+    },
+    secretKey,
+    { expiresIn: '24h' }
+  );
 };
 
 UserSchema.methods.authJSON = function (): any {
   return {
-    firstName : this.firstName,
-    lastName : this.lastName,
-    email   : this.email,
-    token   : this.generateJWT(),
-    image   : this.image
+    firstName: this.firstName,
+    lastName: this.lastName,
+    email: this.email,
+    image: this.image,
+    token: this.generateJWT(),
   };
 };
 
-UserSchema.methods.profileJSON = function (user: UserModel) {
+UserSchema.methods.profileJSON = function () {
   return {
-    firstName : this.firstName,
-    lastName : this.lastName,
-    email   : this.email,
-    image    : this.image || 'https://www.iconspng.com/images/young-user-icon.jpg',
+    firstName: this.firstName,
+    lastName: this.lastName,
+    email: this.email,
+    image: this.image || 'https://www.iconspng.com/images/young-user-icon.jpg',
   };
 };
+
+UserSchema.methods.login = async function (email:string,password:string): Promise<User | null> {
+  try{
+      const user = await User.findOne({ email: email })
+      if(user){
+        if(user.validPassword(password)){
+          return user
+        }else{
+          return null
+        }
+      }else{
+        return null
+      }
+  }catch(err){
+    throw new Error(`Could not find this user ${email} => ${err}`)
+
+  }
+}
 
 export const User: Model<UserModel> = model<UserModel>('User', UserSchema);
