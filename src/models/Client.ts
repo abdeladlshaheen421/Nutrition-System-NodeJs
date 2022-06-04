@@ -38,7 +38,10 @@ const clientSchema = new Schema(
       required: true,
       enum: Gender,
     },
-    last_visit: {
+    image:{
+      type: String,
+    }
+    ,last_visit: {
       type: Date,
     },
     birth_date: {

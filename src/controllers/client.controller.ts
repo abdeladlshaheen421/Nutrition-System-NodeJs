@@ -18,6 +18,7 @@ export type client = {
   password?: string;
   phone?: number;
   gender?: string;
+  image?: string;
   birth_date?: string;
   last_visit?: string;
 };
