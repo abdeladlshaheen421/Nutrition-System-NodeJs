@@ -11,6 +11,7 @@ import mongoose from 'mongoose';
 import clinicRouter from './routers/clinic.router';
 import clientRouter from './routers/client.router';
 import assistantRouter from './routers/assistant.router';
+import clinicAdminRouter from './routers/clinicadmin.router';
 
 dotenv.config();
 const { SERVER_PORT } = process.env;
@@ -49,6 +50,8 @@ clientRouter(app);
 
 //Assistant Router 
 assistantRouter(app);
+// clinic admin routers
+clinicAdminRouter(app);
 
 // Not Found Handler
 app.use((req: Request, res: Response, next: NextFunction): Response => {

@@ -31,8 +31,9 @@ const clinicAdminSchema = new Schema({
   },
   image: {
     type: String,
+    required: true,
   },
 });
 
-const ClinicAdmin = mongoose.model('ClinicAdmin', clinicAdminSchema);
-export default ClinicAdmin;
+const ClinicAdminModel = mongoose.model('ClinicAdmin', clinicAdminSchema);
+export default ClinicAdminModel;
