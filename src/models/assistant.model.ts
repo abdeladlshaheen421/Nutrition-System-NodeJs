@@ -17,6 +17,12 @@ const assistantSchema = new Schema({
     type: String,
     required: true,
   },
+  clinic: {
+    type: Schema.Types.ObjectId,
+    ref: 'Clinic',
+    required: true,
+  },
 });
 
-module.exports = mongoose.model('assistant', assistantSchema);
+const Assistant = mongoose.model('Assistant', assistantSchema);
+export default Assistant;

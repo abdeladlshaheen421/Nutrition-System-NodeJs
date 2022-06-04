@@ -1,4 +1,5 @@
-import { model, Schema } from 'mongoose';
+import mongoose from 'mongoose';
+const { Schema } = mongoose;
 
 export enum Gender {
   'Male',
@@ -50,6 +51,5 @@ const clientSchema = new Schema(
   { timestamps: true }
 );
 
-module.exports = model('client', clientSchema);
-
-export default clientSchema;
+const Client = mongoose.model('Client', clientSchema);
+export default Client;

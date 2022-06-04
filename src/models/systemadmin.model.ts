@@ -19,4 +19,5 @@ const systemAdminSchema = new Schema({
   },
 });
 
-module.exports = mongoose.model('system_admins', systemAdminSchema);
+const SystemAdmin = mongoose.model('SystemAdmin', systemAdminSchema);
+export default SystemAdmin;

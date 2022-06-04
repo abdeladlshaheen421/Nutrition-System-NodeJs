@@ -8,7 +8,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
-import clinicRouter from './routers/clinics'
+import clinicRouter from './routers/clinics';
 dotenv.config();
 const { SERVER_PORT } = process.env;
 
@@ -30,11 +30,11 @@ app.use(morgan('tiny'));
 // home page
 
 app.get('/', (req: express.Request, res: express.Response): void => {
-  res.status(200).json({welcomeMessage:'Welcome To Our Nutrition System'});
+  res.status(200).json({ welcomeMessage: 'Welcome To Our Nutrition System' });
 });
 // clinic routers
-clinicRouter(app)
-/////////////////
+clinicRouter(app);
+
 // Not Found Handler
 app.use((req: Request, res: Response, next: NextFunction): Response => {
   return res.status(404).json({ error: 'Route is Not Found' });
@@ -52,4 +52,4 @@ app.use(
   }
 );
 
-export default app
+export default app;

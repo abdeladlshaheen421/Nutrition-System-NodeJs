@@ -39,9 +39,10 @@ const clinicSchema = new Schema({
   },
   clinic_admin: {
     type: Schema.Types.ObjectId,
-    ref: 'clinic_admins',
+    ref: 'ClinicAdmin',
     required: true,
   },
 });
 
-module.exports = mongoose.model('clinic', clinicSchema);
+const Clinic = mongoose.model('Clinic', clinicSchema);
+export default Clinic;

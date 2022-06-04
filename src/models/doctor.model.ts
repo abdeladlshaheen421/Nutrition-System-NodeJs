@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { Gender } from './Client';
+import { Gender } from './client.model';
 const { Schema } = mongoose;
 
 const doctorSchema = new Schema({
@@ -34,6 +34,12 @@ const doctorSchema = new Schema({
     type: Schema.Types.String,
     enum: Gender,
   },
+  clinic: {
+    type: Schema.Types.ObjectId,
+    ref: 'Clinic',
+    required: true,
+  },
 });
 
-module.exports = mongoose.model('doctor', doctorSchema);
+const Doctor = mongoose.model('Doctor', doctorSchema);
+export default Doctor;

@@ -2,7 +2,7 @@ import * as jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 
-const Client = require('../models/Client');
+import Client from '../models/client.model';
 
 dotenv.config();
 
@@ -105,7 +105,7 @@ export class ClientModel {
       throw new Error(`Could not show this client => ${err}`);
     }
   }
-  
+
   async delete(id: string): Promise<client | null> {
     try {
       const deletedClient = await Client.findByIdAndDelete(id);

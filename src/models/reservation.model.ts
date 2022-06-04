@@ -21,6 +21,22 @@ const reservationSchema = new Schema({
     type: Schema.Types.Date,
     required: true,
   },
+  clinic: {
+    type: Schema.Types.ObjectId,
+    ref: 'Clinic',
+    required: true,
+  },
+  doctor: {
+    type: Schema.Types.ObjectId,
+    ref: 'Doctor',
+    required: true,
+  },
+  client: {
+    type: Schema.Types.ObjectId,
+    ref: 'Client',
+    required: true,
+  },
 });
 
-module.exports = mongoose.model('reservations', reservationSchema);
+const Reservation = mongoose.model('Reservation', reservationSchema);
+export default Reservation;
