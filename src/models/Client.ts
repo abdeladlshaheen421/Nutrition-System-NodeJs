@@ -40,13 +40,13 @@ const clientSchema = new Schema(
     },
     image:{
       type: String,
-    }
-    ,last_visit: {
-      type: Date,
     },
     birth_date: {
       type: Date,
     },
+    last_visit: {
+      type: Date,
+    }
   },
   { timestamps: true }
 );
