@@ -22,6 +22,9 @@ const assistantSchema = new Schema({
     ref: 'Clinic',
     required: true,
   },
+  image: {
+    type: String,
+  },
 });
 
 const Assistant = mongoose.model('Assistant', assistantSchema);

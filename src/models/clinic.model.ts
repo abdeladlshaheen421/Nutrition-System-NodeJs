@@ -17,15 +17,15 @@ const clinicSchema = new Schema({
     type: Schema.Types.String,
     required: true,
   },
-  waiting_time: {
+  waitingTime: {
     type: Schema.Types.String,
     required: true,
   },
-  opens_at: {
+  opensAt: {
     type: Schema.Types.Date,
     required: true,
   },
-  closes_at: {
+  closesAt: {
     type: Schema.Types.Date,
     required: true,
   },
@@ -37,10 +37,13 @@ const clinicSchema = new Schema({
     type: Schema.Types.Number,
     required: true,
   },
-  clinic_admin: {
+  clinicAdmin: {
     type: Schema.Types.ObjectId,
     ref: 'ClinicAdmin',
     required: true,
+  },
+  image: {
+    type: String,
   },
 });
 

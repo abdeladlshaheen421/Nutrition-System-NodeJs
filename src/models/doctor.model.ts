@@ -22,11 +22,11 @@ const doctorSchema = new Schema({
     type: Schema.Types.Number,
     required: true,
   },
-  start_time: {
+  startTime: {
     type: Schema.Types.Date,
     required: true,
   },
-  end_time: {
+  endTime: {
     type: Schema.Types.Date,
     required: true,
   },
@@ -38,6 +38,9 @@ const doctorSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Clinic',
     required: true,
+  },
+  image: {
+    type: String,
   },
 });
 

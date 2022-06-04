@@ -8,11 +8,11 @@ export enum Gender {
 
 const clientSchema = new Schema(
   {
-    first_name: {
+    firstName: {
       type: Schema.Types.String,
       required: true,
     },
-    last_name: {
+    lastName: {
       type: Schema.Types.String,
       required: true,
     },
@@ -31,17 +31,17 @@ const clientSchema = new Schema(
       required: true,
     },
     phone: {
-      type: Schema.Types.Number,
+      type: Schema.Types.String,
       required: true,
     },
     gender: {
       type: Schema.Types.String,
       enum: Gender,
     },
-    last_visit: {
+    lastVisit: {
       type: Schema.Types.Date,
     },
-    birth_date: {
+    birthDate: {
       type: Schema.Types.Date,
     },
     image: {

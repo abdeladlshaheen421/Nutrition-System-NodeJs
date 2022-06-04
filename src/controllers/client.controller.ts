@@ -9,18 +9,18 @@ dotenv.config();
 const { BCRYPT_PASSWORD, SALT_ROUNDS } = process.env;
 const secretKey = process.env.TOKEN_SECRET as jwt.Secret;
 
-export type client = {
+export type ClientType = {
   _id?: string;
-  first_name: string;
-  last_name: string;
+  firstName: string;
+  lastName: string;
   username?: string;
   email: string;
   password?: string;
-  phone?: number;
+  phone: string;
   gender?: string;
   image?: string;
-  birth_date?: string;
-  last_visit?: string;
+  birthDate?: string;
+  lastVisit?: string;
 };
 
 export class ClientModel {
@@ -39,7 +39,7 @@ export class ClientModel {
     return bcrypt.compareSync(password + BCRYPT_PASSWORD, clientPassword);
   }
 
-  async generateJWT(client: client): Promise<string> {
+  async generateJWT(client: ClientType): Promise<string> {
     return jwt.sign(
       {
         id: client._id,
@@ -50,7 +50,7 @@ export class ClientModel {
     );
   }
 
-  async login(email: string, password: string): Promise<client | null> {
+  async login(email: string, password: string): Promise<ClientType | null> {
     try {
       const client = await Client.findOne({ email: email });
       if (client) {
@@ -67,7 +67,7 @@ export class ClientModel {
     }
   }
 
-  async index(): Promise<client[] | null> {
+  async index(): Promise<ClientType[] | null> {
     try {
       const clients = await Client.find();
       return clients;
@@ -76,17 +76,17 @@ export class ClientModel {
     }
   }
 
-  async create(client: client): Promise<client | null> {
+  async create(client: ClientType): Promise<ClientType | null> {
     try {
       const newClient = new Client(client);
-      const savedClient = await newClient.save();
-      return savedClient;
+      newClient.password = await this.setPassword(client.password as string);
+      return await newClient.save();
     } catch (err) {
       throw new Error(`Could not create this client => ${err}`);
     }
   }
 
-  async update(id: string, client: client): Promise<client | null> {
+  async update(id: string, client: ClientType): Promise<ClientType | null> {
     try {
       const updatedClient = await Client.findByIdAndUpdate(id, client, {
         new: true,
@@ -97,7 +97,7 @@ export class ClientModel {
     }
   }
 
-  async show(id: string, client: client): Promise<client | null> {
+  async show(id: string, client: ClientType): Promise<ClientType | null> {
     try {
       const clientToShow = await Client.findById(id);
       return clientToShow;
@@ -106,7 +106,7 @@ export class ClientModel {
     }
   }
 
-  async delete(id: string): Promise<client | null> {
+  async delete(id: string): Promise<ClientType | null> {
     try {
       const deletedClient = await Client.findByIdAndDelete(id);
       return deletedClient;

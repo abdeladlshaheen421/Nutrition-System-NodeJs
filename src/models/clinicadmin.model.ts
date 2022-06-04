@@ -21,13 +21,16 @@ const clinicAdminSchema = new Schema({
     type: Number,
     required: true,
   },
-  birth_date: {
+  birthDate: {
     type: Date,
     required: true,
   },
-  national_id: {
+  nationalId: {
     type: Number,
     required: true,
+  },
+  image: {
+    type: String,
   },
 });
 
