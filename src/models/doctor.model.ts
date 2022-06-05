@@ -5,30 +5,21 @@ const { Schema } = mongoose;
 const doctorSchema = new Schema({
   name: {
     type: Schema.Types.String,
-    required: true,
   },
   email: {
     type: Schema.Types.String,
-    unique: true,
-    required: true,
-    trim: true,
-    lowercase: true,
   },
   password: {
     type: Schema.Types.String,
-    required: true,
   },
   phone: {
-    type: Schema.Types.Number,
-    required: true,
+    type: Schema.Types.String,
   },
   startTime: {
     type: Schema.Types.Date,
-    required: true,
   },
   endTime: {
     type: Schema.Types.Date,
-    required: true,
   },
   gender: {
     type: Schema.Types.String,
@@ -37,7 +28,6 @@ const doctorSchema = new Schema({
   clinic: {
     type: Schema.Types.ObjectId,
     ref: 'Clinic',
-    required: true,
   },
   image: {
     type: String,
