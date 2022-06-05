@@ -26,18 +26,16 @@ const show = async (
     res.status(200).json({ doctor });
   } catch (err) {
     next(err);
-    // throw new Error(`Could not show this doctor => ${err}`);
   }
 };
 
 const create = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    validate(req.body);
+    validate(req);
     const doctor = await DoctorController.create(req.body);
     res.status(200).json({ doctor });
   } catch (err) {
     next(err);
-    // throw new Error(`Could not create this doctor => ${err}`);
   }
 };
 
@@ -47,12 +45,11 @@ const update = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    validate(req.body);
+    validate(req);
     const doctor = await DoctorController.update(req.params.id, req.body);
     res.status(200).json({ doctor });
   } catch (err) {
     next(err);
-    // throw new Error(`Could not edit this doctor => ${err}`);
   }
 };
 
@@ -66,7 +63,6 @@ const remove = async (
     res.status(200).json({ doctor });
   } catch (err) {
     next(err);
-    // throw new Error(`Could not delete this doctor => ${err}`);
   }
 };
 

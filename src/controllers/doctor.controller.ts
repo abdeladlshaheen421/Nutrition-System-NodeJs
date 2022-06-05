@@ -6,8 +6,8 @@ export type DoctorType = {
   email: string;
   password: string;
   phone: string;
-  startTime: Date;
-  endTime: Date;
+  startTime: string;
+  endTime: string;
   gender?: string;
   clinic: ObjectId;
   image?: string;
@@ -16,6 +16,7 @@ export type DoctorType = {
 export class DoctorController {
   public static async create(doctor: DoctorType): Promise<DoctorType> {
     try {
+      console.log(doctor);
       return await Doctor.create(doctor);
     } catch (error) {
       throw new Error(error as string);

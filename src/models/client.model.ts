@@ -29,7 +29,6 @@ const clientSchema = new Schema(
     password: {
       type: Schema.Types.String,
       required: true,
-      select: false,
     },
     phone: {
       type: Schema.Types.String,
