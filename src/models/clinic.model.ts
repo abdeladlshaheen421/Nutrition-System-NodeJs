@@ -14,11 +14,7 @@ const clinicSchema = new Schema({
     required: true,
   },
   location: {
-    type: {
-      city: Schema.Types.String,
-      street: Schema.Types.String,
-      building: Schema.Types.Number,
-    },
+    type: Object,
     required: true,
   },
   waitingTime: {

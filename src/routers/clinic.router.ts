@@ -7,7 +7,7 @@ import {
   validateUpdate,
 } from '../middlewares/clinic.middleware';
 import { validate } from './client.router';
-
+import {matchedData} from 'express-validator'
 // get all clinics
 const index = async (
   req: Request,
@@ -29,8 +29,11 @@ const create = async (
 ): Promise<void> => {
   try {
     validate(req);
+    const matched = matchedData(req, {
+      includeOptionals: true,
+    });
     const newClinic: ClinicType = <ClinicType>(
-      await clinicController.create(req.body)
+      await clinicController.create(<ClinicType>matched)
     );
     res.status(201).json(newClinic);
   } catch (error) {
@@ -75,7 +78,10 @@ const update = async (
 ): Promise<void> => {
   try {
     validate(req);
-    const updatedData = await clinicController.update(req.body, req.params.id);
+    const matched = matchedData(req, {
+      includeOptionals: true,
+    });
+    const updatedData = await clinicController.update(<ClinicType>matched, req.params.id);
     res.send(updatedData);
   } catch (error) {
     next(error);
