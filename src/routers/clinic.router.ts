@@ -29,8 +29,11 @@ const create = async (
 ): Promise<void> => {
   try {
     validate(req);
+    const matched = matchedData(req, {
+      includeOptionals: true,
+    });
     const newClinic: ClinicType = <ClinicType>(
-      await clinicController.create(req.body)
+      await clinicController.create(<ClinicType>matched)
     );
     res.status(201).json(newClinic);
   } catch (error) {
