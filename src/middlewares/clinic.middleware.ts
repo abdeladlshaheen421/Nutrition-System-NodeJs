@@ -25,6 +25,7 @@ const isClinic: CustomValidator = (clinicId: string) => {
 export const isValidIdParam = param('id')
   .isMongoId()
   .withMessage('Not Valid Id');
+
 export const isValidClinic = param('id').custom(isClinic);
 
 // to validate adminId if found
@@ -82,7 +83,7 @@ export const validateCreation = [
     .custom(isValidClinicAdmin),
   body('image')
     .optional()
-    .matches(/^[a-zA-Z0-9]+\.(jpe?g|png)$/i)
+    .matches(/^.*\.(jpe?g|png)$/i)
     .withMessage('Image must be valid Image'),
 ];
 
@@ -123,6 +124,6 @@ export const validateUpdate = [
   body('price').optional().isFloat().withMessage('price must be a number'),
   body('image')
     .optional()
-    .matches(/^[a-zA-Z0-9]+\.(jpe?g|png)$/i)
+    .matches(/^.*\.(jpe?g|png)$/i)
     .withMessage('Image must be valid Image'),
 ];
