@@ -1,4 +1,4 @@
-import { body, CustomValidator } from 'express-validator';
+import { body, CustomValidator, ValidationChain } from 'express-validator';
 import mongoose from 'mongoose';
 
 import Clinic from '../models/clinic.model';
@@ -13,8 +13,12 @@ const isDoctorEmailValid: CustomValidator = async (value) => {
 };
 
 const isStartTimeValid: CustomValidator = (val: Date, { req }) => {
-  if (val >= <Date>req.body.endTime)
+  if (
+    new Date(val).toLocaleTimeString() >=
+    new Date(req.body.endTime).toLocaleTimeString()
+  )
     return Promise.reject('start time must be before end time');
+  return Promise.resolve();
 };
 
 const isClinicValid: CustomValidator = async (id: string) => {
@@ -35,8 +39,7 @@ const isImageValid: CustomValidator = (value: string) => {
 export const validateDoctor = [
   // name
   body('name')
-    // .matches(/^[a-zA-Z ]*$/)
-    .isAlpha()
+    .matches(/^[a-zA-Z ]*$/)
     .withMessage('Name must have letters and spaces only.')
     .isLength({ min: 3, max: 30 })
     .withMessage('Name must be 3 letters min, 30 letters max.'),
@@ -67,18 +70,16 @@ export const validateDoctor = [
   body('startTime')
     .notEmpty()
     .withMessage('start time should not be empty')
-    .isISO8601()
-    .withMessage('Please enter a valid date')
     .toDate()
-    .bail()
     .custom(isStartTimeValid),
   // end time
   body('endTime')
+    .isBefore()
     .notEmpty()
     .withMessage('end time should not be empty')
+    .toDate()
     .isISO8601()
-    .withMessage('Please enter a valid date')
-    .toDate(),
+    .withMessage('Please enter a valid date'),
   // gender
   body('gender')
     .optional({ nullable: true })
@@ -93,3 +94,4 @@ export const validateDoctor = [
   // image
   body('image').optional().custom(isImageValid),
 ];
+
