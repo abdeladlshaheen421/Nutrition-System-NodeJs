@@ -8,6 +8,8 @@ const assistantSchema = new Schema({
   },
   email: {
     type: String,
+    trim: true,
+    lowercase: true,
     unique: true,
     required: true,
   },
@@ -15,6 +17,15 @@ const assistantSchema = new Schema({
     type: String,
     required: true,
   },
+  clinic: {
+    type: Schema.Types.ObjectId,
+    ref: 'Clinic',
+    required: true,
+  },
+  image: {
+    type: String,
+  },
 });
 
-module.exports = mongoose.model('assistants', assistantSchema);
+const Assistant = mongoose.model('Assistant', assistantSchema);
+export default Assistant;

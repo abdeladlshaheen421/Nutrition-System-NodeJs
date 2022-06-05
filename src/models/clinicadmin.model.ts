@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
-const clinicSchema = new Schema({
+const clinicAdminSchema = new Schema({
   name: {
     type: String,
     required: true,
@@ -9,33 +9,30 @@ const clinicSchema = new Schema({
   email: {
     type: String,
     unique: true,
+    trim: true,
+    lowercase: true,
     required: true,
   },
-  location: {
+  password: {
     type: String,
-    unique: true,
-    required: true,
-  },
-  waiting_time: {
-    type: String,
-    required: true,
-  },
-  opens_at: {
-    type: Date,
-    required: true,
-  },
-  closes_at: {
-    type: Date,
     required: true,
   },
   phone: {
     type: Number,
     required: true,
   },
-  price: {
+  birthDate: {
+    type: Date,
+    required: true,
+  },
+  nationalId: {
     type: Number,
     required: true,
   },
+  image: {
+    type: String,
+  },
 });
 
-module.exports = mongoose.model('clinics', clinicSchema);
+const ClinicAdmin = mongoose.model('ClinicAdmin', clinicAdminSchema);
+export default ClinicAdmin;
