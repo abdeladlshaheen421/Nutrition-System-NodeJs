@@ -39,16 +39,11 @@ const isValidClinicAdmin: CustomValidator = (id: string) => {
 
 // to validate start and end date to be not overlaps
 const isValidStartDate: CustomValidator = (val: Number, { req }) => {
-  if (val >= <Number>req.body.closesAt)
+  console.log(val > req.body.closesAt);
+  if (val > <Number>req.body.closesAt) {
     return Promise.reject('start date must be before close date');
-};
-
-// to validate image from user
-const isValidImage: CustomValidator = (value: string) => {
-  const ext: string = value.split('.')[1];
-  const extentions: string[] = ['png', 'jpg', 'jpeg'];
-  if (!extentions.includes(ext))
-    return Promise.reject('please enter a valid image');
+  }
+  return Promise.resolve();
 };
 
 // validate request to body to create new Clinic
@@ -85,7 +80,10 @@ export const validateCreation = [
     .isMongoId()
     .withMessage('please enter a valid admin id')
     .custom(isValidClinicAdmin),
-  body('image').optional().custom(isValidImage),
+  body('image')
+    .optional()
+    .matches(/^[a-zA-Z0-9]+\.(jpe?g|png)$/i)
+    .withMessage('Image must be valid Image'),
 ];
 
 export const validateUpdate = [
@@ -112,8 +110,8 @@ export const validateUpdate = [
   body('opensAt')
     .optional()
     .isInt({ max: 24, min: 0 })
-    .withMessage('start at must be a valid date'),
-  // .custom(isValidStartDate)
+    .withMessage('start at must be a valid date')
+    .custom(isValidStartDate),
   body('closesAt')
     .optional()
     .isInt({ max: 24, min: 0 })
@@ -123,5 +121,8 @@ export const validateUpdate = [
     .matches(/^01[0125][0-9]{8}$/, 'i')
     .withMessage('phone must be a valid egyptian phone number'),
   body('price').optional().isFloat().withMessage('price must be a number'),
-  body('image').optional().custom(isValidImage),
+  body('image')
+    .optional()
+    .matches(/^[a-zA-Z0-9]+\.(jpe?g|png)$/i)
+    .withMessage('Image must be valid Image'),
 ];

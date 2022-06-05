@@ -64,6 +64,11 @@ const destroy = async (clinicId: string): Promise<void> => {
 
 const search = () => {};
 
+const clinicAdmin = (clinicId:string) => {
+  const clinic = Clinic.findById(clinicId,{_id:0,name:1,location:1}).populate('ClinicAdmin')
+  return clinic;
+}
+
 const clinicDoctors = (req: Request, res: Response) => {};
 
 const clinicAssistants = (req: Request, res: Response) => {};

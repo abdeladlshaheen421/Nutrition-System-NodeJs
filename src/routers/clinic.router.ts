@@ -75,7 +75,7 @@ const update = async (
 ): Promise<void> => {
   try {
     validate(req);
-    const updatedData= await clinicController.update(req.body,req.params.id);
+    const updatedData = await clinicController.update(req.body, req.params.id);
     res.send(updatedData);
   } catch (error) {
     next(error);
@@ -93,7 +93,7 @@ const clinicRouter = (app: express.Application): void => {
     .all(isValidIdParam)
     .get(show)
     .delete(destroy)
-    .put( validateUpdate,update)
+    .put(validateUpdate, update);
 
   app.get('/clinics/search', clinicController.search); // using query param
 
