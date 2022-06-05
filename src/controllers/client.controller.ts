@@ -97,7 +97,7 @@ export class ClientModel {
     }
   }
 
-  async show(id: string, client: ClientType): Promise<ClientType | null> {
+  async show(id: string): Promise<ClientType | null> {
     try {
       const clientToShow = await Client.findById(id);
       return clientToShow;
