@@ -18,7 +18,7 @@ export type AssistantType = {
   image?: string;
 };
 
-export class AssistantModel {
+export class AssistantController {
   async setPassword(password: string): Promise<string> {
     const hashedPassword = bcrypt.hashSync(
       password + BCRYPT_PASSWORD,
@@ -102,8 +102,7 @@ export class AssistantModel {
   }
 
   async show(
-    id: string,
-    assistant: AssistantType
+    id: string
   ): Promise<AssistantType | null> {
     try {
       const assistantToShow = await Assistant.findById(id);
