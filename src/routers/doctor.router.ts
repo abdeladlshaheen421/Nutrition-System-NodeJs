@@ -1,7 +1,11 @@
 import { Application, NextFunction, Request, Response } from 'express';
-import { DoctorController } from '../controllers/doctor.controller';
-import { validateDoctor } from './../middlewares/doctor.middleware';
-import { validate } from './client.router';
+import { matchedData } from 'express-validator';
+import { DoctorController, DoctorType } from '../controllers/doctor.controller';
+import {
+  validateDoctor,
+  validateUpdateDoctor,
+} from './../middlewares/doctor.middleware';
+import { validate, verifyAuthToken } from './client.router';
 
 const index = async (
   req: Request,
@@ -46,7 +50,13 @@ const update = async (
 ): Promise<void> => {
   try {
     validate(req);
-    const doctor = await DoctorController.update(req.params.id, req.body);
+    const matched = matchedData(req, {
+      includeOptionals: true,
+    });
+    const doctor = await DoctorController.update(
+      req.params.id,
+      <DoctorType>matched
+    );
     res.status(200).json({ doctor });
   } catch (err) {
     next(err);
@@ -66,12 +76,34 @@ const remove = async (
   }
 };
 
+const login = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const doctor = await DoctorController.login(
+      req.body.email,
+      req.body.password
+    );
+    if (doctor) {
+      const token = await DoctorController.generateJWT(doctor);
+      res.status(200).json({ token });
+    } else {
+      res.status(401).json({ message: 'Invalid credentials' });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 const doctorRouter = (app: Application) => {
-  app.get('/doctors', index);
-  app.get('/doctors/:id', show);
-  app.post('/doctors', validateDoctor, create);
-  app.put('/doctors/:id', validateDoctor, update);
-  app.delete('/doctors/:id', remove);
+  app.get('/doctors', verifyAuthToken, index);
+  app.get('/doctors/:id', verifyAuthToken, show);
+  app.post('/doctors/register', validateDoctor, create);
+  app.post('/doctors/login', login);
+  app.put('/doctors/:id', validateUpdateDoctor, verifyAuthToken, update);
+  app.delete('/doctors/:id', verifyAuthToken, remove);
 };
 
 export default doctorRouter;

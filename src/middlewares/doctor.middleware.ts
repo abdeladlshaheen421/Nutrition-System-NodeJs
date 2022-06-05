@@ -29,13 +29,6 @@ const isClinicValid: CustomValidator = async (id: string) => {
   }
 };
 
-const isImageValid: CustomValidator = (value: string) => {
-  const ext: string = value.split('.')[1];
-  const extentions: string[] = ['png', 'jpg', 'jpeg'];
-  if (!extentions.includes(ext))
-    return Promise.reject('please enter a valid image');
-};
-
 export const validateDoctor = [
   // name
   body('name')
@@ -74,7 +67,6 @@ export const validateDoctor = [
     .custom(isStartTimeValid),
   // end time
   body('endTime')
-    .isBefore()
     .notEmpty()
     .withMessage('end time should not be empty')
     .toDate()
@@ -92,6 +84,55 @@ export const validateDoctor = [
     .bail()
     .custom(isClinicValid),
   // image
-  body('image').optional().custom(isImageValid),
+  body('image')
+    .optional()
+    .matches(/^[a-zA-Z0-9]+\.(jpe?g|png)$/i)
+    .withMessage('Please enter a valid image'),
 ];
 
+export const validateUpdateDoctor = [
+  // name
+  body('name')
+    .optional({ nullable: true })
+    .matches(/^[a-zA-Z ]*$/)
+    .withMessage('Name must have letters and spaces only.')
+    .isLength({ min: 3, max: 30 })
+    .withMessage('Name must be 3 letters min, 30 letters max.'),
+  // phone
+  body('phone')
+    .optional({ nullable: true })
+    .matches(/^01[0125]\d{8}$/)
+    .withMessage('Please enter a valid phone number.'),
+  // start time
+  body('startTime')
+    .optional({ nullable: true })
+    .notEmpty()
+    .withMessage('start time should not be empty')
+    .toDate()
+    .custom(isStartTimeValid),
+  // end time
+  body('endTime')
+    .optional({ nullable: true })
+    .notEmpty()
+    .withMessage('end time should not be empty')
+    .toDate()
+    .isISO8601()
+    .withMessage('Please enter a valid date'),
+  // gender
+  body('gender')
+    .optional({ nullable: true })
+    .isIn(['Male', 'male', 'Female', 'female'])
+    .withMessage('Please enter a valid gender.'),
+  // clinic
+  body('clinic')
+    .optional({ nullable: true })
+    .isMongoId()
+    .withMessage('please enter a valid clinic id')
+    .bail()
+    .custom(isClinicValid),
+  // image
+  body('image')
+    .optional()
+    .matches(/^[a-zA-Z0-9]+\.(jpe?g|png)$/i)
+    .withMessage('Please enter a valid image'),
+];
