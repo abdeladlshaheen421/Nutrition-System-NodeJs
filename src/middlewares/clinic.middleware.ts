@@ -11,6 +11,8 @@ const isValidClinicEmail: CustomValidator = (value) => {
   });
 };
 
+export const isValidIdParam  = param('id').isMongoId().withMessage('Not Valid Id');
+
 const isValidClinicAdmin: CustomValidator = (id: string) => {
   const adminId = new mongoose.Types.ObjectId(id);
   return ClinicAdmin.findById(adminId).then((user) => {

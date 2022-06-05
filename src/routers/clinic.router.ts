@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
 import clinicController, { ClinicType } from '../controllers/clinic.controller';
-import { validateCreation } from '../middlewares/clinic.middleware';
+import { validateCreation,isValidIdParam } from '../middlewares/clinic.middleware';
 import { validate } from './client.router';
 
 // get all clinics
@@ -33,13 +33,25 @@ const create = async (
   }
 };
 
+const show = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    validate(req);
+    const clinic: ClinicType = <ClinicType>(
+      await clinicController.show(req.params.id)
+    );
+    res.status(200).json(clinic);
+  } catch (error) {
+    next(error);
+  }
+};
+
 const clinicRouter = (app: express.Application): void => {
   app
     .route('/clinics')
     .get(index) // get all clinics in our system
     .post(validateCreation, create); // This will create a clinic for Admin
 
-  app.get('/clinic/:id', clinicController.show); // get specific clinic details
+  app.get('/clinic/:id', isValidIdParam ,show); // get specific clinic details
 
   app.get('/clinics/search', clinicController.search); // using query param
 
