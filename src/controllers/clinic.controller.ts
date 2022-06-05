@@ -41,6 +41,27 @@ const create = (clinic: ClinicType): Promise<ClinicType | void> => {
   }
 };
 
+const update = async (
+  clinic: ClinicType,
+  clinicId: string
+): Promise<ClinicType | void> => {
+  try {
+      await Clinic.findByIdAndUpdate(clinicId, clinic);
+      const updatedData:ClinicType =  <ClinicType> await Clinic.findById(clinicId);
+    return  updatedData;
+  } catch (error) {
+    throw new Error(error as string);
+  }
+};
+
+const destroy = async (clinicId: string): Promise<void> => {
+  try {
+    await Clinic.findByIdAndRemove(clinicId);
+  } catch (error) {
+    throw new Error(error as string);
+  }
+};
+
 const search = () => {};
 
 const clinicDoctors = (req: Request, res: Response) => {};
@@ -53,6 +74,8 @@ export default {
   index,
   show,
   create,
+  update,
+  destroy,
   search,
   clinicDoctors,
   clinicAssistants,

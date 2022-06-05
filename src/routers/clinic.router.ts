@@ -1,6 +1,11 @@
 import express, { Request, Response, NextFunction } from 'express';
 import clinicController, { ClinicType } from '../controllers/clinic.controller';
-import { validateCreation } from '../middlewares/clinic.middleware';
+import {
+  validateCreation,
+  isValidIdParam,
+  isValidClinic,
+  validateUpdate,
+} from '../middlewares/clinic.middleware';
 import { validate } from './client.router';
 
 // get all clinics
@@ -33,21 +38,82 @@ const create = async (
   }
 };
 
+const show = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    validate(req);
+    const clinic: ClinicType = <ClinicType>(
+      await clinicController.show(req.params.id)
+    );
+    res.status(200).json(clinic);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const destroy = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    validate(req);
+    await clinicController.destroy(req.params.id);
+    res.status(200).json({ message: 'Clinic is deleted successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const update = async (
+  req: Request,
+  res: Response,
+  next: Function
+): Promise<void> => {
+  try {
+    validate(req);
+    const updatedData= await clinicController.update(req.body,req.params.id);
+    res.send(updatedData);
+  } catch (error) {
+    next(error);
+  }
+};
+
 const clinicRouter = (app: express.Application): void => {
   app
     .route('/clinics')
     .get(index) // get all clinics in our system
     .post(validateCreation, create); // This will create a clinic for Admin
 
-  app.get('/clinic/:id', clinicController.show); // get specific clinic details
+  app
+    .route('/clinic/:id')
+    .all(isValidIdParam)
+    .get(show)
+    .delete(destroy)
+    .put( validateUpdate,update)
 
   app.get('/clinics/search', clinicController.search); // using query param
 
-  app.get('/clinic/:id/doctors', clinicController.clinicDoctors); // get clinic doctors
+  app.get(
+    '/clinic/:id/doctors',
+    isValidIdParam,
+    clinicController.clinicDoctors
+  ); // get clinic doctors
 
-  app.get('/clinic/:id/assistants', clinicController.clinicAssistants); // get clinic assistants
+  app.get(
+    '/clinic/:id/assistants',
+    isValidIdParam,
+    clinicController.clinicAssistants
+  ); // get clinic assistants
 
-  app.get('/clinic/:id/patients', clinicController.clinicPatients); //get clinic patients
+  app.get(
+    '/clinic/:id/patients',
+    isValidIdParam,
+    clinicController.clinicPatients
+  ); //get clinic patients
 };
 
 export default clinicRouter;
