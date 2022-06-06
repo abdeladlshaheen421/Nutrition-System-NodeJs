@@ -1,6 +1,24 @@
-import { body } from 'express-validator';
+import { body, CustomValidator } from 'express-validator';
 import Assistant from '../models/assistant.model';
 import Clinic from '../models/clinic.model';
+
+//Custom Validator
+
+const isAssistantEmailValid: CustomValidator = async (value) => {
+  const assistant = await Assistant.findOne({ email: value });
+  if (assistant) {
+    return Promise.reject('Sorry, e-mail already taken');
+  }
+};
+
+const isClinicValid: CustomValidator = async (value) => {
+  const clinic = await Clinic.findOne({ _id: value });
+  if (!clinic) {
+    return Promise.reject(
+      'Assistant must have a clinic that he belongs to and clinic must be already existed'
+    );
+  }
+};
 
 export const validateCreation = [
   // Name
@@ -8,6 +26,7 @@ export const validateCreation = [
     .trim()
     .isAlpha('en-US', { ignore: ' ' })
     .withMessage('Name must be alphabets only.')
+    .bail()
     .isLength({ max: 30 })
     .withMessage('Name must be 30 letters max.'),
   // password
@@ -21,46 +40,59 @@ export const validateCreation = [
     .trim()
     .isEmail()
     .withMessage('Invalid email.')
-    .custom(async (value) => {
-      const assistant = await Assistant.findOne({ email: value });
-      if (assistant) {
-        return Promise.reject('E-mail already in use');
-      }
-    }),
+    .bail()
+    .custom(isAssistantEmailValid),
   // Clinic
   body('clinic')
     .not()
     .isEmpty()
     .withMessage('You should enter value for the clinic')
+    .bail()
     .isMongoId()
     .withMessage('Not valid Object ID')
-    .custom(async (value) => {
-      const clinic = await Clinic.findOne({ _id: value });
-      if (!clinic) {
-        return Promise.reject(
-          'Assistant must have a clinic that he belongs to..'
-        );
-      }
-    }),
+    .bail()
+    .custom(isClinicValid),
 
   //image
   body('image')
     .optional({ nullable: true })
-    .custom(async (value, { req }) => {
-      const imageFile = req.files && req.files.image;
-      if (!imageFile) {
-        return true;
-      } else if (Array.isArray(imageFile)) {
-        throw new Error('Only one Image file is allowed.');
-      }
-      if (
-        imageFile.mimetype !== 'image/png' &&
-        imageFile.mimetype !== 'image/jpg' &&
-        imageFile.mimetype !== 'image/jpeg'
-      ) {
-        throw new Error(
-          'Only .png, .jpg and .jpeg image formats are allowed for Image file.'
-        );
-      }
-    }),
+    .matches(/^[a-zA-Z0-9]+\.(jpe?g|png)$/i)
+    .withMessage('Image must be valid Image'),
+];
+
+export const validateUpdate = [
+  // Name
+  body('name')
+    .optional()
+    .trim()
+    .isAlpha('en-US', { ignore: ' ' })
+    .withMessage('Name must be alphabets only.')
+    .bail()
+    .isLength({ max: 30 })
+    .withMessage('Name must be 30 letters max.'),
+  // email
+  body('email')
+    .optional()
+    .trim()
+    .isEmail()
+    .withMessage('Invalid email.')
+    .bail()
+    .custom(isAssistantEmailValid),
+  // Clinic
+  body('clinic')
+    .optional()
+    .not()
+    .isEmpty()
+    .withMessage('You should enter value for the clinic')
+    .bail()
+    .isMongoId()
+    .withMessage('Not valid Object ID')
+    .bail()
+    .custom(isClinicValid),
+
+  //image
+  body('image')
+    .optional({ nullable: true })
+    .matches(/^[a-zA-Z0-9]+\.(jpe?g|png)$/i)
+    .withMessage('Image must be valid Image'),
 ];
