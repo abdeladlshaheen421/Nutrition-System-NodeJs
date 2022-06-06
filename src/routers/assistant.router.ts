@@ -31,6 +31,24 @@ const create = async (
   }
 };
 
+const login = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const assistant = await assistantInstance.login(req.body.email, req.body.password);
+    if (assistant) {
+      const token = await assistantInstance.generateJWT(assistant);
+      res.status(200).json({ token });
+    } else {
+      res.status(401).json({ message: 'Invalid credentials' });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 const index = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       validate(req);
@@ -79,6 +97,7 @@ const assistantRouter = (app: Application) => {
     app.get('/assistants', index);
     app.get('/assistants/:id',isValidIdParam, show);
     app.post('/assistants', validateCreation, create);
+    app.post('/assistants/login', login);
     app.patch('/assistants/:id',isValidIdParam, validateUpdate, update);
     app.delete('/assistants/:id',isValidIdParam, remove);
   };
