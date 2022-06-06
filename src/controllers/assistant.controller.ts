@@ -106,7 +106,7 @@ export class AssistantController {
     id: string
   ): Promise<AssistantType | null> {
     try {
-      const assistantToShow = await Assistant.findById(id);
+      const assistantToShow = await Assistant.findById(id, '-password');
       return assistantToShow;
     } catch (err) {
       throw new Error(`Could not show this assistant => ${err}`);
@@ -115,7 +115,9 @@ export class AssistantController {
 
   async delete(id: string): Promise<AssistantType | null> {
     try {
-      const deletedAssistant = await Assistant.findByIdAndDelete(id);
+      const deletedAssistant = await Assistant.findByIdAndDelete(id,
+        {projection:{password:0}} 
+        );
       return deletedAssistant;
     } catch (err) {
       throw new Error(`Could not delete this assistant => ${err}`);
@@ -127,7 +129,7 @@ export class AssistantController {
   ): Promise<AssistantType[] | null> {
     try {
       const assistantsClinic = await Assistant
-      .find({clinic:id});
+      .find({clinic:id}, '-password');
       return assistantsClinic;
     } catch (err) {
       throw new Error(`Could not show assistants of this clinic => ${err}`);
