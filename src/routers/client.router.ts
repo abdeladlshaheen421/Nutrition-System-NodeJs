@@ -1,6 +1,11 @@
 import { NextFunction, Request, Response, Application } from 'express';
-import { ClientModel } from '../controllers/client.controller';
-import { validateCreation , validateUpdate} from './../middlewares/client.middleware';
+import { ClientModel, ClientType } from '../controllers/client.controller';
+import { matchedData } from 'express-validator';
+import {
+  validateCreation,
+  validateUpdate,
+  validatePassword,
+} from './../middlewares/client.middleware';
 import { validationResult } from 'express-validator';
 import * as jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
@@ -47,7 +52,7 @@ const createClient = async (
 ): Promise<void> => {
   try {
     validate(req);
-    const client = await clientInstance.create(req.body);
+    const client: ClientType = await clientInstance.create(req.body);
     res.status(201).json({ client });
   } catch (error) {
     next(error);
@@ -60,7 +65,10 @@ const login = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const client = await clientInstance.login(req.body.email, req.body.password);
+    const client = await clientInstance.login(
+      req.body.email,
+      req.body.password
+    );
     if (client) {
       const token = await clientInstance.generateJWT(client);
       res.status(200).json({ token });
@@ -72,11 +80,15 @@ const login = async (
   }
 };
 
-const getAllClients = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+const getAllClients = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
-    if(res.locals.authUser.role === 'admin'){
-    const clients = await clientInstance.index();
-    res.status(200).json({ clients });
+    if (res.locals.authUser.role === 'admin') {
+      const clients: ClientType[] = await clientInstance.index();
+      res.status(200).json({ clients });
     } else {
       res.status(401).json({ message: 'Unauthorized' });
     }
@@ -85,7 +97,11 @@ const getAllClients = async (req: Request, res: Response, next: NextFunction): P
   }
 };
 
-const showClient = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+const showClient = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const clients = await clientInstance.show(req.params.id);
     res.status(200).json({ clients });
@@ -94,36 +110,82 @@ const showClient = async (req: Request, res: Response, next: NextFunction): Prom
   }
 };
 
-const updatedClient = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+const updatedClient = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     validate(req);
-    const clientId = res.locals.authUser.id;
-    console.log(clientId);
-    delete req.body.password;
-    const client = await clientInstance.update(req.params.id, req.body);
+    const matched = matchedData(req, {
+      includeOptionals: true,
+    });
+    const client: ClientType = await clientInstance.update(
+      req.params.id,
+      <ClientType>matched
+    );
     res.status(200).json({ client });
   } catch (error) {
     next(error);
   }
 };
 
-const deleteClient = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+const deleteClient = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
-    const clientId = res.locals.authUser.id;
-    await clientInstance.delete(req.params.id);
-    res.status(200).json({ message:"client deleted successfully" });
+    if (res.locals.authUser.role === 'admin') {
+      await clientInstance.delete(req.params.id);
+      res.status(200).json({ message: 'client deleted successfully' });
+    } else {
+      res.status(401).json({ message: 'Unauthorized' });
+    }
   } catch (error) {
     next(error);
   }
 };
 
+const updatePassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    validate(req);
+    const oldPassword = req.body.oldPassword;
+    const newPassword = req.body.newPassword;
+    const correctPassword = await clientInstance.findByPassword(
+      req.params.id,
+      oldPassword
+    );
+    if (correctPassword) {
+      const client: ClientType = await clientInstance.updatePassword(
+        req.params.id,
+        newPassword
+      );
+      res.status(200).json({ client });
+    } else {
+      res.status(401).json({ message: 'Invalid credentials' });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
 
 const clientRouter = (app: Application) => {
-  app.get('/clients', verifyAuthToken,getAllClients);
+  app.get('/clients', verifyAuthToken, getAllClients);
   app.get('/clients/:id', verifyAuthToken, showClient);
   app.post('/clients/register', validateCreation, createClient);
   app.post('/clients/login', login);
-  app.patch('/clients/update/:id', validateUpdate,verifyAuthToken,updatedClient);
+  app.patch('/clients/:id', validateUpdate, verifyAuthToken, updatedClient);
+  app.patch(
+    '/clients/:id/password',
+    validatePassword,
+    verifyAuthToken,
+    updatePassword
+  );
   app.delete('/clients/:id', verifyAuthToken, deleteClient);
 };
 

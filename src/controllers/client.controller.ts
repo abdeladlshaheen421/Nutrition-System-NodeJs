@@ -5,7 +5,13 @@ import dotenv from 'dotenv';
 import Client from '../models/client.model';
 
 dotenv.config();
-
+const roles = {
+  admin: 'admin',
+  user: 'user',
+  doctor: 'doctor',
+  assistant: 'assistant',
+  clinicAdmin: 'clinicAdmin',
+};
 const { BCRYPT_PASSWORD, SALT_ROUNDS } = process.env;
 const secretKey = process.env.TOKEN_SECRET as jwt.Secret;
 
@@ -44,6 +50,7 @@ export class ClientModel {
       {
         id: client._id,
         email: client.email,
+        role: 'client',
       },
       secretKey,
       { expiresIn: '24h' }
@@ -67,7 +74,7 @@ export class ClientModel {
     }
   }
 
-  async index(): Promise<ClientType[] | null> {
+  async index(): Promise<ClientType[]> {
     try {
       const clients = await Client.find();
       return clients;
@@ -76,7 +83,7 @@ export class ClientModel {
     }
   }
 
-  async create(client: ClientType): Promise<ClientType | null> {
+  async create(client: ClientType): Promise<ClientType> {
     try {
       const newClient = new Client(client);
       newClient.password = await this.setPassword(client.password as string);
@@ -86,7 +93,7 @@ export class ClientModel {
     }
   }
 
-  async update(id: string, client: ClientType): Promise<ClientType | null> {
+  async update(id: string, client: ClientType): Promise<ClientType> {
     try {
       const updatedClient = await Client.findByIdAndUpdate(id, client, {
         new: true,
@@ -112,6 +119,34 @@ export class ClientModel {
       return deletedClient;
     } catch (err) {
       throw new Error(`Could not delete this client => ${err}`);
+    }
+  }
+
+  async findByPassword(
+    id: string,
+    password: string
+  ): Promise<ClientType | null> {
+    try {
+      const client = await Client.findOne({
+        _id: id,
+        password: await this.setPassword(password),
+      });
+      return client;
+    } catch (err) {
+      throw new Error(`Could not find this client => ${err}`);
+    }
+  }
+
+  async updatePassword(id: string, password: string): Promise<ClientType> {
+    try {
+      const updatedClient = await Client.findByIdAndUpdate(
+        id,
+        { password: await this.setPassword(password) },
+        { new: true }
+      );
+      return updatedClient;
+    } catch (err) {
+      throw new Error(`Could not update this client => ${err}`);
     }
   }
 }

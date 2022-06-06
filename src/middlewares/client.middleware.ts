@@ -34,6 +34,34 @@ export const validateCreation = [
   body('phone')
     .matches(/^01[0125][0-9]{8}$/, 'i')
     .withMessage('Invalid phone number.'),
+
+  body('username')
+    .optional({ nullable: true })
+    .isAlphanumeric('en-US')
+    .withMessage('Username must be alphanumeric only.')
+    .isLength({ max: 30 })
+    .withMessage('Username must be 30 letters max.')
+    .custom(async (value, { req }) => {
+      const client = await Client.findOne({ username: value });
+      if (client && client._id != req.params?.id) {
+        return Promise.reject('Username already in use');
+      }
+    }),
+
+  body('gender')
+    .optional({ nullable: true })
+    .isIn(['Male', 'male', 'Female', 'female'])
+    .withMessage('Gender must be male or female only.'),
+
+  body('birthDate')
+    .optional({ nullable: true })
+    .isDate()
+    .withMessage('Invalid birth date.'),
+
+  body('lastVisit')
+    .optional({ nullable: true })
+    .isDate()
+    .withMessage('Invalid last visit date.'),
 ];
 
 export const validateUpdate = [
@@ -75,7 +103,7 @@ export const validateUpdate = [
     .withMessage('Username must be alphanumeric only.')
     .isLength({ max: 30 })
     .withMessage('Username must be 30 letters max.')
-    .custom(async (value , { req }) => {
+    .custom(async (value, { req }) => {
       const client = await Client.findOne({ username: value });
       if (client && client._id != req.params?.id) {
         return Promise.reject('Username already in use');
@@ -84,11 +112,24 @@ export const validateUpdate = [
 
   body('gender')
     .optional({ nullable: true })
-    .isIn(["Male","male","Female","female"])
-    .withMessage("Gender must be male or female only."),
+    .isIn(['Male', 'male', 'Female', 'female'])
+    .withMessage('Gender must be male or female only.'),
 
-  body('birthDate').optional({ nullable: true }).isDate().withMessage('Invalid birth date.'),
+  body('birthDate')
+    .optional({ nullable: true })
+    .isDate()
+    .withMessage('Invalid birth date.'),
 
-  body('lastVisit').optional({ nullable: true }).isDate().withMessage('Invalid last visit date.')
+  body('lastVisit')
+    .optional({ nullable: true })
+    .isDate()
+    .withMessage('Invalid last visit date.'),
+];
 
+export const validatePassword = [
+  body('newPassword')
+    .isStrongPassword()
+    .withMessage(
+      'Password must be combination of one uppercase, one lower case, one special char and one digit.'
+    ),
 ];

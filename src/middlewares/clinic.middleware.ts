@@ -4,21 +4,19 @@ import ClinicAdmin from '../models/clinicadmin.model';
 import mongoose from 'mongoose';
 
 // validate unique email for every Clinic
-const isValidClinicEmail: CustomValidator = (value) => {
-  return Clinic.findOne({ email: value }).then((clinic) => {
-    if (clinic) {
-      return Promise.reject('This email already exist');
-    }
-  });
+const isValidClinicEmail: CustomValidator = async (value) => {
+  const clinic = await Clinic.findOne({ email: value });
+  if (clinic) {
+    return Promise.reject('This email already exist');
+  }
 };
 
 // validate function if clinic exists
-const isClinic: CustomValidator = (clinicId: string) => {
-  return Clinic.findById(clinicId).then((clinic) => {
-    if (!clinic) {
-      return Promise.reject("This Clinic doesn't exist");
-    }
-  });
+const isClinic: CustomValidator = async (clinicId: string) => {
+  const clinic = await Clinic.findById(clinicId);
+  if (!clinic) {
+    return Promise.reject("This Clinic doesn't exist");
+  }
 };
 
 // validate param id
@@ -29,13 +27,12 @@ export const isValidIdParam = param('id')
 export const isValidClinic = param('id').custom(isClinic);
 
 // to validate adminId if found
-const isValidClinicAdmin: CustomValidator = (id: string) => {
+const isValidClinicAdmin: CustomValidator = async (id: string) => {
   const adminId = new mongoose.Types.ObjectId(id);
-  return ClinicAdmin.findById(adminId).then((user) => {
-    if (!user) {
-      return Promise.reject('Enter a valid System Admin');
-    }
-  });
+  const user = await ClinicAdmin.findById(adminId);
+  if (!user) {
+    return Promise.reject('Enter a valid System Admin');
+  }
 };
 
 // to validate start and end date to be not overlaps
