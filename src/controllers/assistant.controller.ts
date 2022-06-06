@@ -121,4 +121,16 @@ export class AssistantController {
       throw new Error(`Could not delete this assistant => ${err}`);
     }
   }
+
+  async showAssistantsClinic(
+    id: string
+  ): Promise<AssistantType[] | null> {
+    try {
+      const assistantsClinic = await Assistant
+      .find({clinic:id});
+      return assistantsClinic;
+    } catch (err) {
+      throw new Error(`Could not show assistants of this clinic => ${err}`);
+    }
+  }
 }

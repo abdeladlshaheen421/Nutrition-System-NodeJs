@@ -93,12 +93,23 @@ const index = async (req: Request, res: Response, next: NextFunction): Promise<v
     }
   };
 
+  const showAssistantsClinic = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      validate(req);
+      const assistantsClinic = await assistantInstance.showAssistantsClinic(req.params.id);
+      res.status(200).json({ assistantsClinic });
+    } catch (error) {
+      next(error)
+    }
+  };
+
 const assistantRouter = (app: Application) => {
     app.get('/assistants', index);
     app.get('/assistants/:id',isValidIdParam, show);
-    app.post('/assistants', validateCreation, create);
+    app.get('/assistants/clinic/:id',isValidIdParam, showAssistantsClinic);
+    app.post('/assistants/create', validateCreation, create);
     app.post('/assistants/login', login);
-    app.patch('/assistants/:id',isValidIdParam, validateUpdate, update);
+    app.patch('/assistants/update/:id',isValidIdParam, validateUpdate, update);
     app.delete('/assistants/:id',isValidIdParam, remove);
   };
 
