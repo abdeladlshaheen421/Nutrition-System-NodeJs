@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response, Application } from 'express';
 import { AssistantController } from '../controllers/assistant.controller';
-import {validateCreation}  from './../middlewares/assistant.middleware';
+import {validateCreation, validateUpdate}  from './../middlewares/assistant.middleware';
 import { validationResult } from 'express-validator';
+import {isValidIdParam } from '../middlewares/clinic.middleware';
 
 const assistantInstance = new AssistantController();
 
@@ -53,6 +54,7 @@ const index = async (req: Request, res: Response, next: NextFunction): Promise<v
   const update = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       validate(req);
+      delete req.body.password;
       const assistant = await assistantInstance.update(
         req.params.id,
         req.body
@@ -75,10 +77,10 @@ const index = async (req: Request, res: Response, next: NextFunction): Promise<v
 
 const assistantRouter = (app: Application) => {
     app.get('/assistants', index);
-    app.get('/assistants/:id', show);
+    app.get('/assistants/:id',isValidIdParam, show);
     app.post('/assistants', validateCreation, create);
-    app.put('/assistants/:id', validateCreation, update);
-    app.delete('/assistants/:id', remove);
+    app.patch('/assistants/:id',isValidIdParam, validateUpdate, update);
+    app.delete('/assistants/:id',isValidIdParam, remove);
   };
 
 export default assistantRouter;
