@@ -93,6 +93,7 @@ export class AssistantController {
         assistant,
         {
           new: true,
+          projection:{password:0}
         }
       );
       return updatedAssistant;
