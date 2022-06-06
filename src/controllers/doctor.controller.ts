@@ -28,6 +28,7 @@ export class DoctorController {
       {
         id: doctor._id,
         email: doctor.email,
+        role: 'doctor',
       },
       secretKey,
       { expiresIn: '24h' }
@@ -54,6 +55,23 @@ export class DoctorController {
   public static async getOne(id: string): Promise<DoctorType | null> {
     try {
       return await Doctor.findById(id);
+    } catch (error) {
+      throw new Error(error as string);
+    }
+  }
+
+  public static async getClinicDoctors(
+    clinicId: string
+  ): Promise<DoctorType[] | null> {
+    try {
+      return await Doctor.find(
+        { clinic: clinicId },
+        {
+          _id: 0,
+          name: 1,
+          image: 1,
+        }
+      );
     } catch (error) {
       throw new Error(error as string);
     }
