@@ -144,9 +144,12 @@ export class AssistantController {
     try {
       const assistant = await Assistant.findOne({
         _id: assistantId,
-        password: await this.setPassword(password),
       });
-      return assistant;
+      if (await this.validPassword(password, assistant.password)) {
+        return assistant;
+      } else {
+        return null;
+      }
     } catch (err) {
       throw new Error(`Could not find this assistant => ${err}`);
     }
@@ -154,9 +157,10 @@ export class AssistantController {
 
   async updatePassword(id: string, password: string): Promise<AssistantType> {
     try {
+      const hash = await this.setPassword(password);
       const updatedAssistant = await Assistant.findByIdAndUpdate(
         id,
-        { password: await this.setPassword(password) },
+        { password: hash},
         { new: true }
       );
       return updatedAssistant;

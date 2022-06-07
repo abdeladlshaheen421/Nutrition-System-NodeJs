@@ -5,7 +5,7 @@ import {
 } from '../controllers/assistant.controller';
 import {
   validateCreation,
-  validateUpdate,
+  validateUpdate
 } from './../middlewares/assistant.middleware';
 import { isValidIdParam } from '../middlewares/clinic.middleware';
 import { validatePassword } from './../middlewares/client.middleware';
@@ -57,8 +57,7 @@ const getAllAssistants = async (
   try {
     validate(req);
     if (
-      res.locals.authUser.role === 'admin' ||
-      res.locals.authUser.role === 'clinicAdmin'
+      res.locals.authUser.role === 'admin'
     ) {
       const assistants = await assistantInstance.index();
       res.status(200).json({ assistants });
@@ -182,13 +181,13 @@ const updatePassword = async (
       oldPassword
     );
     if (correctPassword) {
-      const client: AssistantType = await assistantInstance.updatePassword(
+      const assistant: AssistantType = await assistantInstance.updatePassword(
         req.params.id,
         newPassword
       );
-      res.status(200).json({ client });
+      res.status(200).json({ assistant });
     } else {
-      res.status(401).json({ message: 'Invalid credentials' });
+      res.status(401).json({ message: 'Invalid credentials for password' });
     }
   } catch (error) {
     next(error);

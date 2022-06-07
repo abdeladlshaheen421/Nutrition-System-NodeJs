@@ -87,7 +87,7 @@ const getAllClients = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    if (res.locals.authUser.role === 'admin') {
+    if (res.locals.authUser.role === 'client') {
       const clients: ClientType[] = await clientInstance.index();
       res.status(200).json({ clients });
     } else {
@@ -157,20 +157,25 @@ const updatePassword = async (
 ): Promise<void> => {
   try {
     validate(req);
-    const oldPassword = req.body.oldPassword;
-    const newPassword = req.body.newPassword;
-    const correctPassword = await clientInstance.findByPassword(
-      req.params.id,
-      oldPassword
-    );
-    if (correctPassword) {
-      const client: ClientType = await clientInstance.updatePassword(
+    const clientId = res.locals.authUser.id;
+    if (clientId === req.params.id) {
+      const oldPassword = req.body.oldPassword;
+      const newPassword = req.body.newPassword;
+      const correctPassword = await clientInstance.findByPassword(
         req.params.id,
-        newPassword
+        oldPassword
       );
-      res.status(200).json({ client });
+      if (correctPassword) {
+        const client: ClientType = await clientInstance.updatePassword(
+          req.params.id,
+          newPassword
+        );
+        res.status(200).json({ client });
+      } else {
+        res.status(401).json({ message: 'Invalid credentials' });
+      }
     } else {
-      res.status(401).json({ message: 'Invalid credentials' });
+      res.status(401).json({ message: 'Unauthorized' });
     }
   } catch (error) {
     next(error);

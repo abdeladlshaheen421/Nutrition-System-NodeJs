@@ -1,12 +1,15 @@
 import { Application, NextFunction, Request, Response } from 'express';
 import { matchedData } from 'express-validator';
+
 import { DoctorController, DoctorType } from '../controllers/doctor.controller';
+import { Role } from '../controllers/client.controller';
 import {
   validateDoctor,
   validateUpdateDoctor,
 } from './../middlewares/doctor.middleware';
-import { validate, verifyAuthToken } from './client.router';
 import { isValidIdParam } from '../middlewares/clinic.middleware';
+import { validatePassword } from '../middlewares/client.middleware';
+import { validate, verifyAuthToken } from './client.router';
 
 const index = async (
   req: Request,
@@ -14,7 +17,10 @@ const index = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    if (res.locals.authUser.role === 'admin') {
+    if (
+      [Role.ADMIN, Role.CLINIC_ADMIN].includes(res.locals.authUser.role) &&
+      res.locals.authUser.id === req.params.id
+    ) {
       const doctors = await DoctorController.getAll();
       res.status(200).json({ doctors });
     } else {
@@ -32,7 +38,12 @@ const show = async (
 ): Promise<void> => {
   try {
     validate(req);
-    if (res.locals.authUser.role === 'doctor') {
+    if (
+      [Role.ADMIN, Role.CLINIC_ADMIN, Role.DOCTOR].includes(
+        res.locals.authUser.role
+      ) &&
+      res.locals.authUser.id === req.params.id
+    ) {
       const doctor = await DoctorController.getOne(req.params.id);
       res.status(200).json({ doctor });
     } else {
@@ -61,7 +72,10 @@ const showClinicDoctors = async (
 const create = async (req: Request, res: Response, next: NextFunction) => {
   try {
     validate(req);
-    if (res.locals.authUser.role === 'admin') {
+    if (
+      [Role.ADMIN, Role.CLINIC_ADMIN].includes(res.locals.authUser.role) &&
+      res.locals.authUser.id === req.params.id
+    ) {
       const doctor = await DoctorController.create(req.body);
       res.status(200).json({ doctor });
     } else {
@@ -79,7 +93,10 @@ const update = async (
 ): Promise<void> => {
   try {
     validate(req);
-    if (res.locals.authUser.role === 'admin') {
+    if (
+      [Role.ADMIN, Role.CLINIC_ADMIN].includes(res.locals.authUser.role) &&
+      res.locals.authUser.id === req.params.id
+    ) {
       const matched = matchedData(req, {
         includeOptionals: true,
       });
@@ -103,7 +120,10 @@ const remove = async (
 ): Promise<void> => {
   try {
     validate(req);
-    if (res.locals.authUser.role === 'admin') {
+    if (
+      [Role.ADMIN, Role.CLINIC_ADMIN].includes(res.locals.authUser.role) &&
+      res.locals.authUser.id === req.params.id
+    ) {
       const doctor = await DoctorController.delete(req.params.id);
       res.status(200).json({ doctor });
     } else {
@@ -135,6 +155,40 @@ const login = async (
   }
 };
 
+const resetPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    validate(req);
+    if (
+      res.locals.authUser.role === Role.DOCTOR &&
+      res.locals.authUser.id === req.params.id
+    ) {
+      const oldPassword = req.body.oldPassword;
+      const newPassword = req.body.newPassword;
+      const doctorWithPassword = await DoctorController.findByPassword(
+        req.params.id,
+        oldPassword
+      );
+      if (doctorWithPassword) {
+        const doctor: DoctorType = await DoctorController.updatePassword(
+          req.params.id,
+          newPassword
+        );
+        res.status(200).json({ doctor });
+      } else {
+        res.status(401).json({ message: 'Invalid credentials' });
+      }
+    } else {
+      res.status(403).send({ message: 'Unauthorized' });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 const doctorRouter = (app: Application) => {
   app.get('/doctors', verifyAuthToken, index);
   app.get('/doctors/:id', isValidIdParam, verifyAuthToken, show);
@@ -152,6 +206,13 @@ const doctorRouter = (app: Application) => {
     validateUpdateDoctor,
     verifyAuthToken,
     update
+  );
+  app.patch(
+    '/doctors/:id/password',
+    isValidIdParam,
+    validatePassword,
+    verifyAuthToken,
+    resetPassword
   );
   app.delete('/doctors/:id', isValidIdParam, verifyAuthToken, remove);
 };

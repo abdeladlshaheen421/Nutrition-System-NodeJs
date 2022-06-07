@@ -131,9 +131,12 @@ export class ClientModel {
     try {
       const client = await Client.findOne({
         _id: id,
-        password: await this.setPassword(password),
       });
-      return client;
+      if (await this.validPassword(password, client.password)) {
+        return client;
+      } else {
+        return null;
+      }
     } catch (err) {
       throw new Error(`Could not find this client => ${err}`);
     }
@@ -141,9 +144,10 @@ export class ClientModel {
 
   async updatePassword(id: string, password: string): Promise<ClientType> {
     try {
+      const hash = await this.setPassword(password);
       const updatedClient = await Client.findByIdAndUpdate(
         id,
-        { password: await this.setPassword(password) },
+        { password: hash },
         { new: true }
       );
       return updatedClient;
