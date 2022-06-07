@@ -115,4 +115,41 @@ export class DoctorController {
       throw new Error(`Could not find this doctor ${email} => ${err}`);
     }
   }
+
+  public static async findByPassword(
+    id: string,
+    password: string
+  ): Promise<DoctorType | null> {
+    try {
+      const hashedOldPassword = await clientInstance.setPassword(password);
+      console.log(hashedOldPassword);
+      const doctor = await Doctor.findOne({
+        _id: id,
+      });
+      if (await clientInstance.validPassword(password, doctor.password)) {
+        return doctor;
+      } else {
+        return null;
+      }
+    } catch (err) {
+      throw new Error(`Could not find this client => ${err}`);
+    }
+  }
+
+  public static async updatePassword(
+    id: string,
+    password: string
+  ): Promise<DoctorType> {
+    try {
+      const newHashedPassword = await clientInstance.setPassword(password);
+      const updatedDoctor = await Doctor.findByIdAndUpdate(
+        id,
+        { password: newHashedPassword },
+        { new: true }
+      );
+      return updatedDoctor;
+    } catch (err) {
+      throw new Error(`Could not update this client => ${err}`);
+    }
+  }
 }

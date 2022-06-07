@@ -11,8 +11,8 @@ export enum Role {
   CLIENT = 'client',
   DOCTOR = 'doctor',
   ASSISTANT = 'assistant',
-  CLINIC_ADMIN = 'clinicAdmin', 
-};
+  CLINIC_ADMIN = 'clinicAdmin',
+}
 
 const { BCRYPT_PASSWORD, SALT_ROUNDS } = process.env;
 const secretKey = process.env.TOKEN_SECRET as jwt.Secret;
@@ -78,7 +78,7 @@ export class ClientModel {
 
   async index(): Promise<ClientType[]> {
     try {
-      const clients = await Client.find({},{password:0});
+      const clients = await Client.find({}, { password: 0 });
       return clients;
     } catch (err) {
       throw new Error(`Could not find any clients => ${err}`);
@@ -129,12 +129,14 @@ export class ClientModel {
     password: string
   ): Promise<ClientType | null> {
     try {
-      const hash = await this.setPassword(password);
       const client = await Client.findOne({
         _id: id,
-        hash
       });
-      return client;
+      if (await this.validPassword(password, client.password)) {
+        return client;
+      } else {
+        return null;
+      }
     } catch (err) {
       throw new Error(`Could not find this client => ${err}`);
     }
@@ -142,9 +144,10 @@ export class ClientModel {
 
   async updatePassword(id: string, password: string): Promise<ClientType> {
     try {
+      const hash = await this.setPassword(password);
       const updatedClient = await Client.findByIdAndUpdate(
         id,
-        { password: await this.setPassword(password) },
+        { password: hash },
         { new: true }
       );
       return updatedClient;
