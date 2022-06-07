@@ -57,8 +57,7 @@ const getAllAssistants = async (
   try {
     validate(req);
     if (
-      res.locals.authUser.role === 'admin' ||
-      (res.locals.authUser.role === 'clinicAdmin')
+      res.locals.authUser.role === 'admin'
     ) {
       const assistants = await assistantInstance.index();
       res.status(200).json({ assistants });
@@ -106,7 +105,7 @@ const updateAssistant = async (
     validate(req);
     if (
       res.locals.authUser.role === 'admin' ||
-      (res.locals.authUser.role === 'clinicAdmin')
+      res.locals.authUser.role === 'clinicAdmin'
     ) {
       delete req.body.password;
       const assistant = await assistantInstance.update(req.params.id, req.body);
