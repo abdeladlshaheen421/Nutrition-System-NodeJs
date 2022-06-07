@@ -1,5 +1,4 @@
 import Clinic from '../models/clinic.model';
-import { Request, Response } from 'express';
 
 export type ClinicType = {
   name: string;
@@ -46,9 +45,9 @@ const update = async (
   clinicId: string
 ): Promise<ClinicType | void> => {
   try {
-      await Clinic.findByIdAndUpdate(clinicId, clinic);
-      const updatedData:ClinicType =  <ClinicType> await Clinic.findById(clinicId);
-    return  updatedData;
+    await Clinic.findByIdAndUpdate(clinicId, clinic);
+    const updatedData: ClinicType = <ClinicType>await Clinic.findById(clinicId);
+    return updatedData;
   } catch (error) {
     throw new Error(error as string);
   }
@@ -64,17 +63,6 @@ const destroy = async (clinicId: string): Promise<void> => {
 
 const search = () => {};
 
-const clinicAdmin = (clinicId:string) => {
-  const clinic = Clinic.findById(clinicId,{_id:0,name:1,location:1}).populate('ClinicAdmin')
-  return clinic;
-}
-
-const clinicDoctors = (req: Request, res: Response) => {};
-
-const clinicAssistants = (req: Request, res: Response) => {};
-
-const clinicPatients = (req: Request, res: Response) => {};
-
 export default {
   index,
   show,
@@ -82,7 +70,4 @@ export default {
   update,
   destroy,
   search,
-  clinicDoctors,
-  clinicAssistants,
-  clinicPatients,
 };

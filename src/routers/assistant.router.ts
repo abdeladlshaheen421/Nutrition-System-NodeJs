@@ -82,7 +82,8 @@ const showAssistant = async (
     if (
       res.locals.authUser.role === 'admin' ||
       res.locals.authUser.role === 'clinicAdmin' ||
-      (res.locals.authUser.role === 'assistant' && res.locals.authUser.id === req.params.id)
+      (res.locals.authUser.role === 'assistant' &&
+        res.locals.authUser.id === req.params.id)
     ) {
       const assistant = await assistantInstance.show(req.params.id);
       res.status(200).json({ assistant });

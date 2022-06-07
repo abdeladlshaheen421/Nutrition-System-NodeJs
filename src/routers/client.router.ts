@@ -182,7 +182,13 @@ const clientRouter = (app: Application) => {
   app.get('/clients/:id', isValidIdParam, verifyAuthToken, showClient);
   app.post('/clients/register', validateCreation, createClient);
   app.post('/clients/login', login);
-  app.patch('/clients/:id',isValidIdParam, validateUpdate, verifyAuthToken, updatedClient);
+  app.patch(
+    '/clients/:id',
+    isValidIdParam,
+    validateUpdate,
+    verifyAuthToken,
+    updatedClient
+  );
   app.patch(
     '/clients/:id/password',
     isValidIdParam,
@@ -190,7 +196,7 @@ const clientRouter = (app: Application) => {
     verifyAuthToken,
     updatePassword
   );
-  app.delete('/clients/:id', isValidIdParam,verifyAuthToken, deleteClient);
+  app.delete('/clients/:id', isValidIdParam, verifyAuthToken, deleteClient);
 };
 
 export default clientRouter;

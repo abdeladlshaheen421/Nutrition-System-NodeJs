@@ -7,7 +7,7 @@ import {
   validateUpdate,
 } from '../middlewares/clinic.middleware';
 import { validate } from './client.router';
-import {matchedData} from 'express-validator'
+import { matchedData } from 'express-validator';
 // get all clinics
 const index = async (
   req: Request,
@@ -81,7 +81,10 @@ const update = async (
     const matched = matchedData(req, {
       includeOptionals: true,
     });
-    const updatedData = await clinicController.update(<ClinicType>matched, req.params.id);
+    const updatedData = await clinicController.update(
+      <ClinicType>matched,
+      req.params.id
+    );
     res.send(updatedData);
   } catch (error) {
     next(error);
@@ -102,24 +105,6 @@ const clinicRouter = (app: express.Application): void => {
     .put(validateUpdate, update);
 
   app.get('/clinics/search', clinicController.search); // using query param
-
-  app.get(
-    '/clinic/:id/doctors',
-    isValidIdParam,
-    clinicController.clinicDoctors
-  ); // get clinic doctors
-
-  app.get(
-    '/clinic/:id/assistants',
-    isValidIdParam,
-    clinicController.clinicAssistants
-  ); // get clinic assistants
-
-  app.get(
-    '/clinic/:id/patients',
-    isValidIdParam,
-    clinicController.clinicPatients
-  ); //get clinic patients
 };
 
 export default clinicRouter;

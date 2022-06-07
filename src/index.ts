@@ -15,15 +15,13 @@ import clinicAdminRouter from './routers/clinicadmin.router';
 import doctorRouter from './routers/doctor.router';
 
 dotenv.config();
-const { SERVER_PORT } = process.env;
+const { SERVER_PORT, DATABASE_CONNECTION } = process.env;
 
 const app: express.Application = express();
 const PORT = SERVER_PORT || 8080;
 
 mongoose
-  .connect(
-    'mongodb+srv://admin:admin@nutritionsystem.rdmpf.mongodb.net/final?retryWrites=true&w=majority'
-  )
+  .connect(DATABASE_CONNECTION as string)
   .then(() => {
     console.log('Connecting to DB ...');
     app.listen(PORT, () => {
@@ -37,7 +35,7 @@ mongoose
 app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
-
+app.use(express.static(`${__dirname}/assets`));
 // home page
 app.get('/', (req: express.Request, res: express.Response): void => {
   res.status(200).json({ welcomeMessage: 'Welcome To Our Nutrition System' });
