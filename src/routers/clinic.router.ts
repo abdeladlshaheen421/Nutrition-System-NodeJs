@@ -8,6 +8,8 @@ import {
 } from '../middlewares/clinic.middleware';
 import { validate } from './client.router';
 import { matchedData } from 'express-validator';
+import {upload} from '../utilities/Image.utils'
+
 // get all clinics
 const index = async (
   req: Request,
@@ -95,7 +97,7 @@ const clinicRouter = (app: express.Application): void => {
   app
     .route('/clinics')
     .get(index) // get all clinics in our system
-    .post(validateCreation, create); // This will create a clinic for Admin
+    .post(validateCreation,upload.single('image') ,create); // This will create a clinic for Admin
 
   app
     .route('/clinic/:id')

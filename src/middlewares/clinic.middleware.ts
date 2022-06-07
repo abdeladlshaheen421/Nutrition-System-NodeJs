@@ -37,8 +37,7 @@ const isValidClinicAdmin: CustomValidator = async (id: string) => {
 
 // to validate start and end date to be not overlaps
 const isValidStartDate: CustomValidator = (val: Number, { req }) => {
-  console.log(val > req.body.closesAt);
-  if (val > <Number>req.body.closesAt) {
+  if (Number(val)> (<Number>req.body.closesAt)) {
     return Promise.reject('start date must be before close date');
   }
   return Promise.resolve();
@@ -52,6 +51,7 @@ export const validateCreation = [
   body('email')
     .isEmail()
     .withMessage('email must be a valid email')
+    .bail()
     .custom(isValidClinicEmail),
   body('location.city')
     .isAlpha('en-US', { ignore: ' ' })
@@ -66,6 +66,7 @@ export const validateCreation = [
   body('opensAt')
     .isInt({ max: 24, min: 0 })
     .withMessage('start at must be a valid date')
+    .bail()
     .custom(isValidStartDate),
   body('closesAt')
     .isInt({ max: 24, min: 0 })
@@ -77,6 +78,7 @@ export const validateCreation = [
   body('clinicAdmin')
     .isMongoId()
     .withMessage('please enter a valid admin id')
+    .bail()
     .custom(isValidClinicAdmin),
   body('image')
     .optional()
