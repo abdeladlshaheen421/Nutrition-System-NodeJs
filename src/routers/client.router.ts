@@ -6,6 +6,7 @@ import {
   validateUpdate,
   validatePassword,
 } from './../middlewares/client.middleware';
+import { isValidIdParam } from '../middlewares/clinic.middleware';
 import { validationResult } from 'express-validator';
 import * as jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
@@ -103,6 +104,7 @@ const showClient = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    validate(req);
     const clients = await clientInstance.show(req.params.id);
     res.status(200).json({ clients });
   } catch (error) {
@@ -136,6 +138,7 @@ const deleteClient = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    validate(req);
     if (res.locals.authUser.role === 'admin') {
       await clientInstance.delete(req.params.id);
       res.status(200).json({ message: 'client deleted successfully' });
@@ -176,17 +179,18 @@ const updatePassword = async (
 
 const clientRouter = (app: Application) => {
   app.get('/clients', verifyAuthToken, getAllClients);
-  app.get('/clients/:id', verifyAuthToken, showClient);
+  app.get('/clients/:id', isValidIdParam, verifyAuthToken, showClient);
   app.post('/clients/register', validateCreation, createClient);
   app.post('/clients/login', login);
-  app.patch('/clients/:id', validateUpdate, verifyAuthToken, updatedClient);
+  app.patch('/clients/:id',isValidIdParam, validateUpdate, verifyAuthToken, updatedClient);
   app.patch(
     '/clients/:id/password',
+    isValidIdParam,
     validatePassword,
     verifyAuthToken,
     updatePassword
   );
-  app.delete('/clients/:id', verifyAuthToken, deleteClient);
+  app.delete('/clients/:id', isValidIdParam,verifyAuthToken, deleteClient);
 };
 
 export default clientRouter;

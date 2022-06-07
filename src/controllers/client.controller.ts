@@ -5,13 +5,15 @@ import dotenv from 'dotenv';
 import Client from '../models/client.model';
 
 dotenv.config();
-const roles = {
-  admin: 'admin',
-  user: 'user',
-  doctor: 'doctor',
-  assistant: 'assistant',
-  clinicAdmin: 'clinicAdmin',
+
+export enum Role {
+  ADMIN = 'admin',
+  CLIENT = 'client',
+  DOCTOR = 'doctor',
+  ASSISTANT = 'assistant',
+  CLINIC_ADMIN = 'clinicAdmin', 
 };
+
 const { BCRYPT_PASSWORD, SALT_ROUNDS } = process.env;
 const secretKey = process.env.TOKEN_SECRET as jwt.Secret;
 
@@ -50,7 +52,7 @@ export class ClientModel {
       {
         id: client._id,
         email: client.email,
-        role: 'client',
+        role: Role.CLIENT,
       },
       secretKey,
       { expiresIn: '24h' }
@@ -76,7 +78,7 @@ export class ClientModel {
 
   async index(): Promise<ClientType[]> {
     try {
-      const clients = await Client.find();
+      const clients = await Client.find({},{password:0});
       return clients;
     } catch (err) {
       throw new Error(`Could not find any clients => ${err}`);
