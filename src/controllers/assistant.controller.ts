@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 
 import Assistant from '../models/assistant.model';
-
+import {Role} from './client.controller'; 
 dotenv.config();
 
 const { BCRYPT_PASSWORD, SALT_ROUNDS } = process.env;
@@ -39,6 +39,7 @@ export class AssistantController {
       {
         id: assistant._id,
         email: assistant.email,
+        role: Role.ASSISTANT
       },
       secretKey,
       { expiresIn: '24h' }
@@ -125,14 +126,42 @@ export class AssistantController {
   }
 
   async showAssistantsClinic(
-    id: string
+    clinicId: string
   ): Promise<AssistantType[] | null> {
     try {
       const assistantsClinic = await Assistant
-      .find({clinic:id}, '-password');
+      .find({clinic:clinicId}, '-password');
       return assistantsClinic;
     } catch (err) {
       throw new Error(`Could not show assistants of this clinic => ${err}`);
+    }
+  }
+
+  async findByPassword(
+    assistantId: string,
+    password: string
+  ): Promise<AssistantType | null> {
+    try {
+      const assistant = await Assistant.findOne({
+        _id: assistantId,
+        password: await this.setPassword(password),
+      });
+      return assistant;
+    } catch (err) {
+      throw new Error(`Could not find this assistant => ${err}`);
+    }
+  }
+
+  async updatePassword(id: string, password: string): Promise<AssistantType> {
+    try {
+      const updatedAssistant = await Assistant.findByIdAndUpdate(
+        id,
+        { password: await this.setPassword(password) },
+        { new: true }
+      );
+      return updatedAssistant;
+    } catch (err) {
+      throw new Error(`Could not update this Assistant => ${err}`);
     }
   }
 }
