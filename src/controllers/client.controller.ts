@@ -129,9 +129,10 @@ export class ClientModel {
     password: string
   ): Promise<ClientType | null> {
     try {
+      const hash = await this.setPassword(password);
       const client = await Client.findOne({
         _id: id,
-        password: await this.setPassword(password),
+        hash
       });
       return client;
     } catch (err) {

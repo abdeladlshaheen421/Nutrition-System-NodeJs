@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 
 import Assistant from '../models/assistant.model';
-import {Role} from './client.controller'; 
+import { Role } from './client.controller';
 dotenv.config();
 
 const { BCRYPT_PASSWORD, SALT_ROUNDS } = process.env;
@@ -39,7 +39,7 @@ export class AssistantController {
       {
         id: assistant._id,
         email: assistant.email,
-        role: Role.ASSISTANT
+        role: Role.ASSISTANT,
       },
       secretKey,
       { expiresIn: '24h' }
@@ -94,7 +94,7 @@ export class AssistantController {
         assistant,
         {
           new: true,
-          projection:{password:0}
+          projection: { password: 0 },
         }
       );
       return updatedAssistant;
@@ -103,9 +103,7 @@ export class AssistantController {
     }
   }
 
-  async show(
-    id: string
-  ): Promise<AssistantType | null> {
+  async show(id: string): Promise<AssistantType | null> {
     try {
       const assistantToShow = await Assistant.findById(id, '-password');
       return assistantToShow;
@@ -116,9 +114,9 @@ export class AssistantController {
 
   async delete(id: string): Promise<AssistantType | null> {
     try {
-      const deletedAssistant = await Assistant.findByIdAndDelete(id,
-        {projection:{password:0}} 
-        );
+      const deletedAssistant = await Assistant.findByIdAndDelete(id, {
+        projection: { password: 0 },
+      });
       return deletedAssistant;
     } catch (err) {
       throw new Error(`Could not delete this assistant => ${err}`);
@@ -129,8 +127,10 @@ export class AssistantController {
     clinicId: string
   ): Promise<AssistantType[] | null> {
     try {
-      const assistantsClinic = await Assistant
-      .find({clinic:clinicId}, '-password');
+      const assistantsClinic = await Assistant.find(
+        { clinic: clinicId },
+        '-password'
+      );
       return assistantsClinic;
     } catch (err) {
       throw new Error(`Could not show assistants of this clinic => ${err}`);
@@ -142,9 +142,10 @@ export class AssistantController {
     password: string
   ): Promise<AssistantType | null> {
     try {
+      const hash = await this.setPassword(password);
       const assistant = await Assistant.findOne({
         _id: assistantId,
-        password: await this.setPassword(password),
+        hash
       });
       return assistant;
     } catch (err) {
