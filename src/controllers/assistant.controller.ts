@@ -142,12 +142,14 @@ export class AssistantController {
     password: string
   ): Promise<AssistantType | null> {
     try {
-      const hash = await this.setPassword(password);
       const assistant = await Assistant.findOne({
         _id: assistantId,
-        password:hash
       });
-      return assistant;
+      if (await this.validPassword(password, assistant.password)) {
+        return assistant;
+      } else {
+        return null;
+      }
     } catch (err) {
       throw new Error(`Could not find this assistant => ${err}`);
     }
