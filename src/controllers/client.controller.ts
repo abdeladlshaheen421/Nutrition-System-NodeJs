@@ -132,7 +132,7 @@ export class ClientModel {
       const hash = await this.setPassword(password);
       const client = await Client.findOne({
         _id: id,
-        hash
+        password:hash
       });
       return client;
     } catch (err) {
@@ -142,9 +142,10 @@ export class ClientModel {
 
   async updatePassword(id: string, password: string): Promise<ClientType> {
     try {
+      const hash = await this.setPassword(password);
       const updatedClient = await Client.findByIdAndUpdate(
         id,
-        { password: await this.setPassword(password) },
+        { password: hash },
         { new: true }
       );
       return updatedClient;
