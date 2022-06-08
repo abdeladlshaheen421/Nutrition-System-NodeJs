@@ -1,7 +1,7 @@
 import * as jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
-
+import nodemailer from 'nodemailer';
 import Client from '../models/client.model';
 
 dotenv.config();
@@ -156,3 +156,33 @@ export class ClientModel {
     }
   }
 }
+const { EMAIL_HOST, EMAIL_USER, EMAIL_PASS } = process.env;
+type option = {
+  from: string;
+  to: string;
+  subject: string;
+  text?: string;
+  html?: string;
+};
+export const isUser = async (email: string): Promise<boolean> => {
+  const existedUser = await Client.find({ email });
+  return existedUser ? true : false;
+};
+export const sendEmail = async (options: option): Promise<void> => {
+  const transporter = nodemailer.createTransport({
+    service: EMAIL_HOST,
+    auth: {
+      user: EMAIL_USER,
+      pass: EMAIL_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: options.from,
+    to: options.to,
+    subject: options.subject,
+    text: options.text,
+  };
+
+  await transporter.sendMail(mailOptions);
+};

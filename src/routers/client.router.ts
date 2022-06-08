@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response, Application } from 'express';
-import { ClientModel, ClientType } from '../controllers/client.controller';
+import { ClientModel, ClientType,isUser,sendEmail } from '../controllers/client.controller';
 import { matchedData } from 'express-validator';
 import {
   validateCreation,
@@ -203,5 +203,19 @@ const clientRouter = (app: Application) => {
   );
   app.delete('/clients/:id', isValidIdParam, verifyAuthToken, deleteClient);
 };
+
+const resetPassword = async(req: Request,res: Response):Promise<void> =>{
+  if(await isUser(req.body.email))
+    {
+      sendEmail({
+        from:'',
+        to:'',
+        subject:'',
+        text:''
+      })
+    }else{
+      res.status(401).json({message:'un authorized to reset password'})
+    }
+}
 
 export default clientRouter;
