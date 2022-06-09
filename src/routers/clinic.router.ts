@@ -8,8 +8,23 @@ import {
 } from '../middlewares/clinic.middleware';
 import { validate } from './client.router';
 import { matchedData } from 'express-validator';
-import {upload} from '../utilities/Image.utils'
+import sharp from 'sharp';
+import multer from 'multer';
 
+const storage = multer.memoryStorage();
+// resizeImage middleware
+const resizeImage = (req: Request, res: Response, next: NextFunction): void => {
+  if (!req.file) return next();
+  req.file.filename = `clinic-${Math.random()}-${Date.now()}.jpeg`;
+  sharp(req.file.buffer)
+    .resize(400, 400)
+    .toFormat('jpeg')
+    .jpeg({ quality: 90 })
+    .toFile(`./../assets/images/${req.file.filename}`);
+  next();
+}; 
+
+const upload = multer({storage})
 // get all clinics
 const index = async (
   req: Request,
@@ -97,7 +112,7 @@ const clinicRouter = (app: express.Application): void => {
   app
     .route('/clinics')
     .get(index) // get all clinics in our system
-    .post(validateCreation,upload.single('image') ,create); // This will create a clinic for Admin
+    .post(validateCreation, upload.single('image'), create); // This will create a clinic for Admin
 
   app
     .route('/clinic/:id')
