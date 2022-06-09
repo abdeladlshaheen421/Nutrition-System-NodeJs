@@ -174,6 +174,10 @@ const updatePassword = async (
 ): Promise<void> => {
   try {
     validate(req);
+    if (
+      (res.locals.authUser.role === 'assistant' &&
+      res.locals.authUser.id === req.params.id)
+    ) {
     const oldPassword = req.body.oldPassword;
     const newPassword = req.body.newPassword;
     const correctPassword = await assistantInstance.findByPassword(
@@ -189,6 +193,9 @@ const updatePassword = async (
     } else {
       res.status(401).json({ message: 'Invalid credentials for password' });
     }
+  } else {
+    res.status(403).send({ message: 'You are Unauthorized to update password' });
+  }
   } catch (error) {
     next(error);
   }
