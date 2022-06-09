@@ -1,5 +1,10 @@
 import { NextFunction, Request, Response, Application } from 'express';
-import { ClientModel, ClientType,isUser,sendEmail } from '../controllers/client.controller';
+import {
+  ClientModel,
+  ClientType,
+  isUser,
+  sendEmail,
+} from '../controllers/client.controller';
 import { matchedData } from 'express-validator';
 import {
   validateCreation,
@@ -37,7 +42,7 @@ export const verifyAuthToken = async (
     const header = req.headers.authorization as unknown as string;
     const jwtToken = header.split(' ')[1];
     const decoded = jwt.verify(jwtToken, secretKey);
-    //sending data of logged in user to the next middleware
+    // sending data of logged in user to the next middleware
     res.locals.authUser = decoded;
     next();
   } catch (error) {
@@ -204,18 +209,17 @@ const clientRouter = (app: Application) => {
   app.delete('/clients/:id', isValidIdParam, verifyAuthToken, deleteClient);
 };
 
-const resetPassword = async(req: Request,res: Response):Promise<void> =>{
-  if(await isUser(req.body.email))
-    {
-      sendEmail({
-        from:'',
-        to:'',
-        subject:'',
-        text:''
-      })
-    }else{
-      res.status(401).json({message:'un authorized to reset password'})
-    }
-}
+const resetPassword = async (req: Request, res: Response): Promise<void> => {
+  if (await isUser(req.body.email)) {
+    sendEmail({
+      from: '',
+      to: '',
+      subject: '',
+      text: '',
+    });
+  } else {
+    res.status(401).json({ message: 'un authorized to reset password' });
+  }
+};
 
 export default clientRouter;
