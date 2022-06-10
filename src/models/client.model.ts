@@ -47,6 +47,14 @@ const clientSchema = new Schema(
     image: {
       type: String,
     },
+    status: {
+      type: String, 
+      enum: ['Pending', 'Active'],
+      default: 'Pending'
+    },
+    confirmationCode: { 
+      type: String, 
+      unique: true },
   },
   { timestamps: true }
 );

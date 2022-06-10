@@ -29,6 +29,8 @@ export type ClientType = {
   image?: string;
   birthDate?: string;
   lastVisit?: string;
+  status: string;
+  confirmationCode?: string;
 };
 
 export class ClientModel {
@@ -88,13 +90,16 @@ export class ClientModel {
   async create(client: ClientType): Promise<ClientType> {
     try {
       const newClient = new Client(client);
+      const token =await jwt.sign(client.email, secretKey)
+      
       newClient.password = await this.setPassword(client.password as string);
+      newClient.confirmationCode = token
       return await newClient.save();
     } catch (err) {
       throw new Error(`Could not create this client => ${err}`);
     }
   }
-
+  
   async update(id: string, client: ClientType): Promise<ClientType> {
     try {
       const updatedClient = await Client.findByIdAndUpdate(id, client, {
@@ -176,13 +181,18 @@ export const sendEmail = async (options: option): Promise<void> => {
       pass: EMAIL_PASS,
     },
   });
-
   const mailOptions = {
     from: options.from,
     to: options.to,
     subject: options.subject,
+    html: options.html,
     text: options.text,
   };
 
   await transporter.sendMail(mailOptions);
 };
+
+export const verifyEmail =async (code:string):Promise<Boolean> => {
+  const client:ClientType | null = await Client.findOneAndUpdate({confirmationCode:code}, {status: 'Active'});
+  return client? true:false;
+}
