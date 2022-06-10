@@ -22,9 +22,9 @@ const resizeImage = (req: Request, res: Response, next: NextFunction): void => {
     .jpeg({ quality: 90 })
     .toFile(`./../assets/images/${req.file.filename}`);
   next();
-}; 
+};
 
-const upload = multer({storage})
+const upload = multer({ storage });
 // get all clinics
 const index = async (
   req: Request,
@@ -108,6 +108,18 @@ const update = async (
   }
 };
 
+const search = async (req: Request, res: Response): Promise<void> => {
+  const searchText: string = req.query.search as string;
+  if(searchText)
+  {
+    const result = await clinicController.search(searchText);
+    res.status(200).json(result);
+  }
+  else{
+    res.status(404).json({msg:'Invalid query'});
+  }
+  
+};
 const clinicRouter = (app: express.Application): void => {
   app
     .route('/clinics')
@@ -121,7 +133,7 @@ const clinicRouter = (app: express.Application): void => {
     .delete(destroy)
     .put(validateUpdate, update);
 
-  app.get('/clinics/search', clinicController.search); // using query param
+  app.get('/clinics/search', search); // using query param
 };
 
 export default clinicRouter;

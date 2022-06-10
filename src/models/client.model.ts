@@ -47,6 +47,12 @@ const clientSchema = new Schema(
     image: {
       type: String,
     },
+    forgotPasswordToken: {
+      type: Schema.Types.String
+    },
+    forgotPasswordExpiresIn:{
+      type: Schema.Types.String,
+    }
   },
   { timestamps: true }
 );

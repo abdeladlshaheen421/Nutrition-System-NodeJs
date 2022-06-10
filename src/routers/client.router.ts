@@ -201,6 +201,8 @@ const clientRouter = (app: Application) => {
     verifyAuthToken,
     updatePassword
   );
+  app.post('/forgotPassword',);
+  app.post('forgot/:forgotToken',)
   app.delete('/clients/:id', isValidIdParam, verifyAuthToken, deleteClient);
 };
 
