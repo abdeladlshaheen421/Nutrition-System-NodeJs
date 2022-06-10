@@ -5,6 +5,7 @@ import {
   isUser,
   sendEmail,
   verifyEmail,
+  makePasswordResetToken
 } from '../controllers/client.controller';
 import { matchedData } from 'express-validator';
 import {
@@ -212,6 +213,24 @@ const updatePassword = async (
     next(error);
   }
 };
+// const forgotPasswordEmail =(req: Request, res: Response) =>{
+  
+// }
+const resetPassword = async (req: Request, res: Response): Promise<void> => {
+  const clientEmail =req.body.email;
+  if (await isUser(clientEmail)) {
+    const token = await makePasswordResetToken(clientEmail);
+    sendEmail({
+      from: 'A-Team',
+      to: clientEmail,
+      subject: 'reset your password',
+      html:  `<h1>to reset your password click url</h1><p>${token}</p>`,
+    });
+    res.status(200).json({msg:'please Check your email'})
+  } else {
+    res.status(401).json({ message: 'un authorized to reset password' });
+  }
+};
 
 const clientRouter = (app: Application) => {
   app.get('/clients', verifyAuthToken, getAllClients);
@@ -232,23 +251,12 @@ const clientRouter = (app: Application) => {
     verifyAuthToken,
     updatePassword
   );
-  app.post('/forgotPassword',);
+  app.post('/forgotPassword',resetPassword);
   app.post('forgot/:forgotToken',)
   app.delete('/clients/:id', isValidIdParam, verifyAuthToken, deleteClient);
   app.get('/confirm/:confirmationCode', emailVerification);
 };
 
-const resetPassword = async (req: Request, res: Response): Promise<void> => {
-  if (await isUser(req.body.email)) {
-    sendEmail({
-      from: '',
-      to: '',
-      subject: '',
-      text: '',
-    });
-  } else {
-    res.status(401).json({ message: 'un authorized to reset password' });
-  }
-};
+
 
 export default clientRouter;

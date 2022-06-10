@@ -48,10 +48,10 @@ const clientSchema = new Schema(
       type: String,
     },
     forgotPasswordToken: {
-      type: Schema.Types.String
+      type: Schema.Types.Number
     },
     forgotPasswordExpiresIn:{
-      type: Schema.Types.String,
+      type: Schema.Types.Date,
     },
     status: {
       type: String, 

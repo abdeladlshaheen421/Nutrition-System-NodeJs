@@ -90,16 +90,16 @@ export class ClientModel {
   async create(client: ClientType): Promise<ClientType> {
     try {
       const newClient = new Client(client);
-      const token =await jwt.sign(client.email, secretKey)
-      
+      const token = await jwt.sign(client.email, secretKey);
+
       newClient.password = await this.setPassword(client.password as string);
-      newClient.confirmationCode = token
+      newClient.confirmationCode = token;
       return await newClient.save();
     } catch (err) {
       throw new Error(`Could not create this client => ${err}`);
     }
   }
-  
+
   async update(id: string, client: ClientType): Promise<ClientType> {
     try {
       const updatedClient = await Client.findByIdAndUpdate(id, client, {
@@ -173,6 +173,21 @@ export const isUser = async (email: string): Promise<boolean> => {
   const existedUser = await Client.find({ email });
   return existedUser ? true : false;
 };
+export const makePasswordResetToken = async (
+  email: string
+): Promise<Number> => {
+  const token = Math.ceil(Math.random() * 100000);
+  const time = new Date(new Date().getTime() + 60 * 60 * 24 * 1000);
+  try {
+    await Client.findOneAndUpdate(
+      { email },
+      { forgotPasswordToken: token, forgotPasswordExpiresIn: time }
+    );
+    return token;
+  } catch (error) {
+    throw new Error(error as string);
+  }
+};
 export const sendEmail = async (options: option): Promise<void> => {
   const transporter = nodemailer.createTransport({
     service: EMAIL_HOST,
@@ -192,7 +207,10 @@ export const sendEmail = async (options: option): Promise<void> => {
   await transporter.sendMail(mailOptions);
 };
 
-export const verifyEmail =async (code:string):Promise<Boolean> => {
-  const client:ClientType | null = await Client.findOneAndUpdate({confirmationCode:code}, {status: 'Active'});
-  return client? true:false;
-}
+export const verifyEmail = async (code: string): Promise<Boolean> => {
+  const client: ClientType | null = await Client.findOneAndUpdate(
+    { confirmationCode: code },
+    { status: 'Active' }
+  );
+  return client ? true : false;
+};
