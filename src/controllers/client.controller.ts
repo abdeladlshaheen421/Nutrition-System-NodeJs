@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 import nodemailer from 'nodemailer';
 import Client from '../models/client.model';
-
+import {uid} from 'rand-token';
 dotenv.config();
 
 export enum Role {
@@ -91,7 +91,8 @@ export class ClientModel {
   async create(client: ClientType): Promise<ClientType> {
     try {
       const newClient = new Client(client);
-      const token = await jwt.sign(client.email, secretKey);
+      const token = uid(64);
+      // await jwt.sign(client.email, secretKey);
 
       newClient.password = await this.setPassword(client.password as string);
       newClient.confirmationCode = token;
@@ -178,7 +179,8 @@ export const makePasswordResetToken = async (
   email: string
 ): Promise<ClientType> => {
   // const token = Math.ceil(Math.random() * 100000);
-  const token = await jwt.sign(email, secretKey);
+  const token = uid(64);
+  // await jwt.sign(email, secretKey);
 
   const time = new Date(new Date().getTime() + 60 * 60 * 24 * 1000);
   try {

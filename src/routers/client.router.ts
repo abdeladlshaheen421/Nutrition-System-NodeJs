@@ -232,7 +232,7 @@ const resetPassword = async (req: Request, res: Response): Promise<void> => {
       from: 'A-Team',
       to: clientEmail,
       subject: 'reset your password',
-      html:  `<h1>to reset your password click url</h1><a href='http://localhost:3000/forgot/${client._id}/${client.forgotPasswordToken}'>Reset Now</a>`,
+      html:  `<h1>to reset your password click url</h1><a href='http://localhost:3000/verifyToken/${client.forgotPasswordToken}'>Reset Now</a>`,
     });
     res.status(200).json({msg:'please Check your email'})
   } else {
