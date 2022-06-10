@@ -48,7 +48,7 @@ const clientSchema = new Schema(
       type: String,
     },
     forgotPasswordToken: {
-      type: Schema.Types.Number
+      type: Schema.Types.String
     },
     forgotPasswordExpiresIn:{
       type: Schema.Types.Date,

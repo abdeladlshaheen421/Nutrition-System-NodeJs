@@ -31,6 +31,7 @@ export type ClientType = {
   lastVisit?: string;
   status: string;
   confirmationCode?: string;
+  forgotPasswordToken?: string;
 };
 
 export class ClientModel {
@@ -175,15 +176,18 @@ export const isUser = async (email: string): Promise<boolean> => {
 };
 export const makePasswordResetToken = async (
   email: string
-): Promise<Number> => {
-  const token = Math.ceil(Math.random() * 100000);
+): Promise<ClientType> => {
+  // const token = Math.ceil(Math.random() * 100000);
+  const token = await jwt.sign(email, secretKey);
+
   const time = new Date(new Date().getTime() + 60 * 60 * 24 * 1000);
   try {
-    await Client.findOneAndUpdate(
+    const client = await Client.findOneAndUpdate(
       { email },
-      { forgotPasswordToken: token, forgotPasswordExpiresIn: time }
+      { forgotPasswordToken: token, forgotPasswordExpiresIn: time },
+      {new: true}
     );
-    return token;
+    return client;
   } catch (error) {
     throw new Error(error as string);
   }
@@ -206,7 +210,17 @@ export const sendEmail = async (options: option): Promise<void> => {
 
   await transporter.sendMail(mailOptions);
 };
-
+export const changePassword = async(token:string,newPassword:string):Promise<void>=>{
+  try{
+    const model =new ClientModel();
+    const hashedPassword = await model.setPassword(newPassword);
+    console.log(token,hashedPassword);
+    await Client.findOneAndUpdate({forgotPasswordToken:token},{password:hashedPassword})
+  }catch(err) {
+    console.log(err);
+    throw new Error(`Could not find user`);
+  }
+}
 export const verifyEmail = async (code: string): Promise<Boolean> => {
   const client: ClientType | null = await Client.findOneAndUpdate(
     { confirmationCode: code },
