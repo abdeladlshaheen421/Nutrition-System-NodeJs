@@ -52,7 +52,15 @@ const clientSchema = new Schema(
     },
     forgotPasswordExpiresIn:{
       type: Schema.Types.String,
-    }
+    },
+    status: {
+      type: String, 
+      enum: ['Pending', 'Active'],
+      default: 'Pending'
+    },
+    confirmationCode: { 
+      type: String, 
+      unique: true },
   },
   { timestamps: true }
 );

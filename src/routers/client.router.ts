@@ -1,5 +1,11 @@
 import { NextFunction, Request, Response, Application } from 'express';
-import { ClientModel, ClientType,isUser,sendEmail } from '../controllers/client.controller';
+import {
+  ClientModel,
+  ClientType,
+  isUser,
+  sendEmail,
+  verifyEmail,
+} from '../controllers/client.controller';
 import { matchedData } from 'express-validator';
 import {
   validateCreation,
@@ -10,7 +16,6 @@ import { isValidIdParam } from '../middlewares/clinic.middleware';
 import { validationResult } from 'express-validator';
 import * as jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-
 dotenv.config();
 
 const secretKey = process.env.TOKEN_SECRET as jwt.Secret;
@@ -37,7 +42,7 @@ export const verifyAuthToken = async (
     const header = req.headers.authorization as unknown as string;
     const jwtToken = header.split(' ')[1];
     const decoded = jwt.verify(jwtToken, secretKey);
-    //sending data of logged in user to the next middleware
+    // sending data of logged in user to the next middleware
     res.locals.authUser = decoded;
     next();
   } catch (error) {
@@ -54,10 +59,30 @@ const createClient = async (
   try {
     validate(req);
     const client: ClientType = await clientInstance.create(req.body);
+    await sendEmail({
+      from: 'A-Team',
+      to: client.email,
+      subject: 'Verify your Email',
+      html: `<h1>Email Confirmation</h1>
+      <h2>Hello ${client.firstName}</h2>
+      <p>Thank you for subscribing. Please confirm your email by clicking on the following link</p>
+      <a href=http://localhost:3000/confirm/${client.confirmationCode}> Click here</a>
+      </div>`,
+    });
     res.status(201).json({ client });
   } catch (error) {
     next(error);
   }
+};
+const emailVerification = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const token = req.params.confirmationCode;
+  const isActive = await verifyEmail(token);
+  isActive
+    ? res.status(200).json({ Message: 'Email verified successfully' })
+    : res.status(404).json({ Message: "Email Can't be verified" });
 };
 
 const login = async (
@@ -71,8 +96,14 @@ const login = async (
       req.body.password
     );
     if (client) {
-      const token = await clientInstance.generateJWT(client);
-      res.status(200).json({ token });
+      if (client.status != 'Active') {
+        res.status(401).json({
+          message: 'Pending Account. Please Verify Your Email!',
+        });
+      } else {
+        const token = await clientInstance.generateJWT(client);
+        res.status(200).json({ token });
+      }
     } else {
       res.status(401).json({ message: 'Invalid credentials' });
     }
@@ -204,20 +235,20 @@ const clientRouter = (app: Application) => {
   app.post('/forgotPassword',);
   app.post('forgot/:forgotToken',)
   app.delete('/clients/:id', isValidIdParam, verifyAuthToken, deleteClient);
+  app.get('/confirm/:confirmationCode', emailVerification);
 };
 
-const resetPassword = async(req: Request,res: Response):Promise<void> =>{
-  if(await isUser(req.body.email))
-    {
-      sendEmail({
-        from:'',
-        to:'',
-        subject:'',
-        text:''
-      })
-    }else{
-      res.status(401).json({message:'un authorized to reset password'})
-    }
-}
+const resetPassword = async (req: Request, res: Response): Promise<void> => {
+  if (await isUser(req.body.email)) {
+    sendEmail({
+      from: '',
+      to: '',
+      subject: '',
+      text: '',
+    });
+  } else {
+    res.status(401).json({ message: 'un authorized to reset password' });
+  }
+};
 
 export default clientRouter;
