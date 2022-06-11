@@ -6,7 +6,7 @@ import {
   sendEmail,
   verifyEmail,
   makePasswordResetToken,
-  changePassword
+  changePassword,
 } from '../controllers/client.controller';
 import { matchedData } from 'express-validator';
 import {
@@ -214,27 +214,31 @@ const updatePassword = async (
     next(error);
   }
 };
-const resetPasswordUpdate =async(req: Request, res: Response, next: NextFunction) =>{
+const resetPasswordUpdate = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const token = req.params.token;
   const password = req.body.newPassword;
-  try{
-    await changePassword(token,password)
-    res.status(200).json({msg: 'Password changed successfully'});
-  }catch (error) {
+  try {
+    await changePassword(token, password);
+    res.status(200).json({ msg: 'Password changed successfully' });
+  } catch (error) {
     next(error);
   }
-}
+};
 const resetPassword = async (req: Request, res: Response): Promise<void> => {
-  const clientEmail =req.body.email;
+  const clientEmail = req.body.email;
   if (await isUser(clientEmail)) {
     const client = await makePasswordResetToken(clientEmail);
     sendEmail({
       from: 'A-Team',
       to: clientEmail,
       subject: 'reset your password',
-      html:  `<h1>to reset your password click url</h1><a href='http://localhost:3000/verifyToken/${client.forgotPasswordToken}'>Reset Now</a>`,
+      html: `<h1>to reset your password click url</h1><a href='http://localhost:3000/verifyToken/${client.forgotPasswordToken}'>Reset Now</a>`,
     });
-    res.status(200).json({msg:'please Check your email'})
+    res.status(200).json({ msg: 'please Check your email' });
   } else {
     res.status(401).json({ message: 'un authorized to reset password' });
   }
@@ -259,12 +263,10 @@ const clientRouter = (app: Application) => {
     verifyAuthToken,
     updatePassword
   );
-  app.post('/forgotPassword',resetPassword);
-  app.post('/verifyToken/:token',resetPasswordUpdate)
+  app.post('/forgotPassword', resetPassword);
+  app.post('/verifyToken/:token', resetPasswordUpdate);
   app.delete('/clients/:id', isValidIdParam, verifyAuthToken, deleteClient);
   app.get('/confirm/:confirmationCode', emailVerification);
 };
-
-
 
 export default clientRouter;

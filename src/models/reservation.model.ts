@@ -1,10 +1,11 @@
 import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
-enum Status {
+export enum Status {
   PENDING = 'pending',
   APPROVED = 'approved',
   REJECTED = 'rejected',
+  COMPLETED = 'completed',
 }
 
 const reservationSchema = new Schema({
