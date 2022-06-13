@@ -14,6 +14,7 @@ import assistantRouter from './routers/assistant.router';
 import clinicAdminRouter from './routers/clinicadmin.router';
 import doctorRouter from './routers/doctor.router';
 import bodyParser from 'body-parser';
+import reservationRouter from './routers/reservation.router';
 dotenv.config();
 const { SERVER_PORT, DATABASE_CONNECTION } = process.env;
 
@@ -34,7 +35,7 @@ mongoose
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended:true }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 app.use('/static',express.static(`${__dirname}/assets`));
 // home page
@@ -48,8 +49,12 @@ clinicRouter(app);
 // client routers
 clientRouter(app);
 
-//Assistant Router
+// Assistant Router
 assistantRouter(app);
+
+// reservation Router
+reservationRouter(app);
+
 // clinic admin routers
 clinicAdminRouter(app);
 

@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 import nodemailer from 'nodemailer';
 import Client from '../models/client.model';
-import {uid} from 'rand-token';
+import { uid } from 'rand-token';
 dotenv.config();
 
 export enum Role {
@@ -187,7 +187,7 @@ export const makePasswordResetToken = async (
     const client = await Client.findOneAndUpdate(
       { email },
       { forgotPasswordToken: token, forgotPasswordExpiresIn: time },
-      {new: true}
+      { new: true }
     );
     return client;
   } catch (error) {
@@ -212,18 +212,24 @@ export const sendEmail = async (options: option): Promise<void> => {
 
   await transporter.sendMail(mailOptions);
 };
-export const changePassword = async(token:string,newPassword:string):Promise<void>=>{
-  try{
-    const model =new ClientModel();
+export const changePassword = async (
+  token: string,
+  newPassword: string
+): Promise<void> => {
+  try {
+    const model = new ClientModel();
     const hashedPassword = await model.setPassword(newPassword);
-    console.log(token,hashedPassword);
-    await Client.findOneAndUpdate({forgotPasswordToken:token},{password:hashedPassword})
-  }catch(err) {
+    console.log(token, hashedPassword);
+    await Client.findOneAndUpdate(
+      { forgotPasswordToken: token },
+      { password: hashedPassword }
+    );
+  } catch (err) {
     console.log(err);
     throw new Error(`Could not find user`);
   }
-}
-export const verifyEmail = async (code: string): Promise<Boolean> => {
+};
+export const verifyEmail = async (code: string): Promise<boolean> => {
   const client: ClientType | null = await Client.findOneAndUpdate(
     { confirmationCode: code },
     { status: 'Active' }
