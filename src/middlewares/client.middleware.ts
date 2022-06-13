@@ -1,6 +1,23 @@
 import { body } from 'express-validator';
 import Client from '../models/client.model';
 
+export const isValidEmail = body('email')
+  .isEmail()
+  .withMessage('Email should be a valid email')
+  .bail()
+  .custom(async (email) => {
+    const client = await Client.findOne({ email: email });
+    if (!client) {
+      return Promise.reject('E-mail already in use');
+    }
+    return Promise.resolve();
+  });
+
+export const isValidPassword = body('newPassword')
+  .isStrongPassword()
+  .withMessage(
+    'password should include special char and at least captial char and number'
+  );
 export const validateCreation = [
   // first name
   body('firstName')

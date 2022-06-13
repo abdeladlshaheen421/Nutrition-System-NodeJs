@@ -171,10 +171,10 @@ type option = {
   text?: string;
   html?: string;
 };
-export const isUser = async (email: string): Promise<boolean> => {
-  const existedUser = await Client.find({ email });
-  return existedUser ? true : false;
-};
+// export const isUser = async (email: string): Promise<boolean> => {
+//   const existedUser = await Client.find({ email });
+//   return existedUser ? true : false;
+// };
 export const makePasswordResetToken = async (
   email: string
 ): Promise<ClientType> => {
