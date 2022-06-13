@@ -15,6 +15,8 @@ import clinicAdminRouter from './routers/clinicadmin.router';
 import doctorRouter from './routers/doctor.router';
 import bodyParser from 'body-parser';
 import reservationRouter from './routers/reservation.router';
+import dashboardRouter from './routers/dashboard.router';
+
 dotenv.config();
 const { SERVER_PORT, DATABASE_CONNECTION } = process.env;
 
@@ -37,11 +39,14 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan('dev'));
-app.use('/static',express.static(`${__dirname}/assets`));
+app.use('/static', express.static(`${__dirname}/assets`));
 // home page
 app.get('/', (req: express.Request, res: express.Response): void => {
   res.status(200).json({ welcomeMessage: 'Welcome To Our Nutrition System' });
 });
+
+// dashboard routers
+dashboardRouter(app);
 
 // clinic routers
 clinicRouter(app);

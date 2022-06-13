@@ -61,22 +61,20 @@ const destroy = async (clinicId: string): Promise<void> => {
   }
 };
 
-const search = async(text:string) => {
+const search = async (text: string) => {
   try {
-    const Clinics = await Clinic.find({$text:{$search:text}});
+    const Clinics = await Clinic.find({ $text: { $search: text } });
     return Clinics;
-  }catch (error)
-  {
+  } catch (error) {
     throw new Error(error as string);
   }
 };
 
-const getAdminClinic = async(adminId:string):Promise<ClinicType|null> => {
+const getAdminClinic = async (adminId: string): Promise<ClinicType | null> => {
   try {
-    const clinic = await Clinic.findOne({clinicAdmin:adminId});
+    const clinic = await Clinic.findOne({ clinicAdmin: adminId });
     return clinic;
-  }catch (error)
-  {
+  } catch (error) {
     throw new Error(error as string);
   }
 };
@@ -87,5 +85,5 @@ export default {
   update,
   destroy,
   search,
-  getAdminClinic
+  getAdminClinic,
 };

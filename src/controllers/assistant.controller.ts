@@ -160,7 +160,7 @@ export class AssistantController {
       const hash = await this.setPassword(password);
       const updatedAssistant = await Assistant.findByIdAndUpdate(
         id,
-        { password: hash},
+        { password: hash },
         { new: true }
       );
       return updatedAssistant;
