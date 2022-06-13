@@ -5,7 +5,7 @@ import {
 } from '../controllers/assistant.controller';
 import {
   validateCreation,
-  validateUpdate
+  validateUpdate,
 } from './../middlewares/assistant.middleware';
 import { isValidIdParam } from '../middlewares/clinic.middleware';
 import { validatePassword } from './../middlewares/client.middleware';
@@ -56,9 +56,7 @@ const getAllAssistants = async (
 ): Promise<void> => {
   try {
     validate(req);
-    if (
-      res.locals.authUser.role === 'admin'
-    ) {
+    if (res.locals.authUser.role === 'admin') {
       const assistants = await assistantInstance.index();
       res.status(200).json({ assistants });
     } else {
@@ -175,27 +173,29 @@ const updatePassword = async (
   try {
     validate(req);
     if (
-      (res.locals.authUser.role === 'assistant' &&
-      res.locals.authUser.id === req.params.id)
+      res.locals.authUser.role === 'assistant' &&
+      res.locals.authUser.id === req.params.id
     ) {
-    const oldPassword = req.body.oldPassword;
-    const newPassword = req.body.newPassword;
-    const correctPassword = await assistantInstance.findByPassword(
-      req.params.id,
-      oldPassword
-    );
-    if (correctPassword) {
-      const assistant: AssistantType = await assistantInstance.updatePassword(
+      const oldPassword = req.body.oldPassword;
+      const newPassword = req.body.newPassword;
+      const correctPassword = await assistantInstance.findByPassword(
         req.params.id,
-        newPassword
+        oldPassword
       );
-      res.status(200).json({ assistant });
+      if (correctPassword) {
+        const assistant: AssistantType = await assistantInstance.updatePassword(
+          req.params.id,
+          newPassword
+        );
+        res.status(200).json({ assistant });
+      } else {
+        res.status(401).json({ message: 'Invalid credentials for password' });
+      }
     } else {
-      res.status(401).json({ message: 'Invalid credentials for password' });
+      res
+        .status(403)
+        .send({ message: 'You are Unauthorized to update password' });
     }
-  } else {
-    res.status(403).send({ message: 'You are Unauthorized to update password' });
-  }
   } catch (error) {
     next(error);
   }
