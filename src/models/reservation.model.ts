@@ -6,6 +6,7 @@ export enum Status {
   APPROVED = 'approved',
   REJECTED = 'rejected',
   COMPLETED = 'completed',
+  CANCELED = 'canceled',
 }
 
 const reservationSchema = new Schema({

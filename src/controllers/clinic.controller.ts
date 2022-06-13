@@ -61,12 +61,11 @@ const destroy = async (clinicId: string): Promise<void> => {
   }
 };
 
-const search = async(text:string) => {
+const search = async (text: string) => {
   try {
-    const Clinics = await Clinic.find({$text:{$search:text}});
+    const Clinics = await Clinic.find({ $text: { $search: text } });
     return Clinics;
-  }catch (error)
-  {
+  } catch (error) {
     throw new Error(error as string);
   }
 };

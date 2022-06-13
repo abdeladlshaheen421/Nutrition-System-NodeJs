@@ -46,6 +46,6 @@ const clinicSchema = new Schema({
     type: String,
   },
 });
-clinicSchema.index({name:'text','location.city':'text'})
+clinicSchema.index({ name: 'text', 'location.city': 'text' });
 const Clinic = mongoose.model('Clinic', clinicSchema);
 export default Clinic;
