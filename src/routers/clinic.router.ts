@@ -110,15 +110,28 @@ const update = async (
 
 const search = async (req: Request, res: Response): Promise<void> => {
   const searchText: string = req.query.search as string;
-  if(searchText)
-  {
+  if (searchText) {
     const result = await clinicController.search(searchText);
     res.status(200).json(result);
+  } else {
+    res.status(404).json({ msg: 'Invalid query' });
   }
-  else{
-    res.status(404).json({msg:'Invalid query'});
+};
+
+const getAdminClinic = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    validate(req);
+    const clinic: ClinicType = <ClinicType>(
+      await clinicController.getAdminClinic(req.params.adminId)
+    );
+    res.status(200).json(clinic);
+  } catch (error) {
+    next(error);
   }
-  
 };
 const clinicRouter = (app: express.Application): void => {
   app
@@ -134,6 +147,7 @@ const clinicRouter = (app: express.Application): void => {
     .put(validateUpdate, update);
 
   app.get('/clinics/search', search); // using query param
+  app.get('/clinicAdmin/:adminId/clinic',getAdminClinic)
 };
 
 export default clinicRouter;

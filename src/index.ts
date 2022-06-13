@@ -36,7 +36,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended:true }));
 app.use(morgan('dev'));
-app.use(express.static(`${__dirname}/assets`));
+app.use('/static',express.static(`${__dirname}/assets`));
 // home page
 app.get('/', (req: express.Request, res: express.Response): void => {
   res.status(200).json({ welcomeMessage: 'Welcome To Our Nutrition System' });

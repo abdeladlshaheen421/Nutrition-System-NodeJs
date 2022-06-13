@@ -71,6 +71,15 @@ const search = async(text:string) => {
   }
 };
 
+const getAdminClinic = async(adminId:string):Promise<ClinicType|null> => {
+  try {
+    const clinic = await Clinic.findOne({clinicAdmin:adminId});
+    return clinic;
+  }catch (error)
+  {
+    throw new Error(error as string);
+  }
+};
 export default {
   index,
   show,
@@ -78,4 +87,5 @@ export default {
   update,
   destroy,
   search,
+  getAdminClinic
 };
